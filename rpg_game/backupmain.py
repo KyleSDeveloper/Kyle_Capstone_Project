@@ -22,29 +22,31 @@ SCREEN_HEIGHT = 600
 ANIMATION_SPEED = 8
 
 # Load the TMJ map
-with open(r"C:\Users\speng\OneDrive\Desktop\Kyle_Capstone_Project\maps\testmap.tmj") as f:
+with open(r'rpg_game\\testmap.tmj') as f:
     tmx_data = json.load(f)
 
-# Load the tileset image
-tileset_image_path = os.path.join(os.path.dirname(r"C:\Users\speng\OneDrive\Desktop\Kyle_Capstone_Project\maps\testmap.tmj"), tmx_data['tilesets'][0]['image'])
-tileset_image = pygame.image.load(tileset_image_path)
 
-# Check if the tileset is inline or external
-tileset = tmx_data['tilesets'][0]
-if 'image' in tileset:
-    # Inline tileset
-    tileset_image_path = os.path.join(os.path.dirname(r"C:\Users\speng\OneDrive\Desktop\Kyle_Capstone_Project\maps\testmap.tmj"), tileset['image'])
-    tileset_image = pygame.image.load(tileset_image_path)
-else:
-    # External tileset
-    tileset_path = os.path.join(os.path.dirname(r"C:\Users\speng\OneDrive\Desktop\Kyle_Capstone_Project\maps\testmap.tmj"), tileset['source'])
-    with open(tileset_path) as f:
-        tileset_data = json.load(f)
-    tileset_image_path = os.path.join(os.path.dirname(tileset_path), tileset_data['image'])
+
+    # Load the tileset image
+    tileset_image_path = os.path.join(os.path.dirname(r"rpg_game\\testmap.tmj"), tmx_data['tilesets'][0]['image'])
     tileset_image = pygame.image.load(tileset_image_path)
 
-# Create screen object
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    # Check if the tileset is inline or external
+    tileset = tmx_data['tilesets'][0]
+    if 'image' in tileset:
+        # Inline tileset
+        tileset_image_path = os.path.join(os.path.dirname(r"rpg_game\\testmap.tmj"), tmx_data['tilesets'][0]['image'])
+        tileset_image = pygame.image.load(tileset_image_path)
+    else:
+        # External tileset
+        tileset_path = os.path.join(os.path.dirname(r"rpg_game\\testmap.tmj"), tileset['source'])
+        with open(tileset_path) as f:
+            tileset_data = json.load(f)
+        tileset_image_path = os.path.join(os.path.dirname(tileset_path), tileset_data['image'])
+        tileset_image = pygame.image.load(tileset_image_path)
+
+    # Create screen object
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
 

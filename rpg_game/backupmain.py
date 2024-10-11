@@ -222,7 +222,7 @@ while running:
     
     screen.fill((0, 0, 0))  # Clear screen
     screen.blit(character.image, character.rect) # Draw player
-    # Ensure program maintains a rate of 30 frames per second
+    
     clock.tick(100)
     pygame.display.flip() # updates display
 

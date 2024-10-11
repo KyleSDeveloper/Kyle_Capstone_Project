@@ -67,12 +67,12 @@
  "nextobjectid":1,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.11.0",
+ "tiledversion":"1.10.2",
  "tileheight":30,
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/..\/..\/MainLev2.0.tsx"
+         "source":"assets\/MainLev2.0.tsx"
         }],
  "tilewidth":30,
  "type":"map",

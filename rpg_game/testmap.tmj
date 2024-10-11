@@ -72,7 +72,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"MainLev2.0.tsx"
+         "source":"..\/..\/..\/..\/MainLev2.0.tsx"
         }],
  "tilewidth":30,
  "type":"map",

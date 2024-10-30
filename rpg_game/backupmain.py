@@ -12,7 +12,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("2D RPG")
 
 # Map loading
-tmxdata = load_pygame('rpg_game/assets/maps/New_Map.tmx')
+tmxdata = load_pygame('rpg_game/assets/maps/untitled.tmx')
 
 # Helper function to render the map
 def blit_all_tiles(window, tmxdata, world_offset):

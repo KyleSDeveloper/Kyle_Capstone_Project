@@ -105,8 +105,6 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
-         
-
         # Update animation
         self.animation_frames = animations[self.direction][self.action]
         self.animation_index += self.animation_speed
@@ -127,7 +125,7 @@ class Player(pygame.sprite.Sprite):
         return False
 
 # Initialize player
-player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//2)
+player = Player(SCREEN_WIDTH//2, SCREEN_HEIGHT//1.3)
 all_sprites = pygame.sprite.Group(player)
 
 # Camera setup

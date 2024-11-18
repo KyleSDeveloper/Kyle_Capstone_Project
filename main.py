@@ -61,6 +61,21 @@ animations = {
               'pickup': load_sprite_sheet('rpg_game/assets/character/_pick up.png', 5, 'pickup') }
 }
 
+enemy_animations = {
+    'down': {'idle': load_sprite_sheet('rpg_game/assets/enemy/_down idle.png', 5, 'idle'),
+             'walk': load_sprite_sheet('rpg_game/assets/enemy/_down walk.png', 6, 'walk'),
+             'attack': load_sprite_sheet('rpg_game/assets/enemy/_down attack.png', 4, 'attack') },
+    'up': {'idle': load_sprite_sheet('rpg_game/assets/enemy/_up idle.png', 5, 'idle'),
+           'walk': load_sprite_sheet('rpg_game/assets/enemy/_up walk.png', 6, 'walk'),
+           'attack': load_sprite_sheet('rpg_game/assets/enemy/_up attack.png', 4, 'attack') },
+    'left': {'idle': load_sprite_sheet('rpg_game/assets/enemy/_side idle.png', 5, 'idle'),
+             'walk': load_sprite_sheet('rpg_game/assets/enemy/_side walk.png', 6, 'walk'),
+             'attack': load_sprite_sheet('rpg_game/assets/enemy/_side attack.png', 3, 'attack') },
+    'right': {'idle': load_sprite_sheet('rpg_game/assets/enemy/_side idle.png', 5, 'idle', direction='right'),
+              'walk': load_sprite_sheet('rpg_game/assets/enemy/_side walk.png', 6, 'walk', direction='right'),
+              'attack': load_sprite_sheet('rpg_game/assets/enemy/_side attack.png', 3, 'attack', direction='right') }
+}
+
 # Player setup
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):

@@ -238,6 +238,7 @@ class GameWindow(arcade.Window):
 
         # Init the parent class
         super().__init__(width, height, title)
+        
 
         # Player sprite
         self.player_sprite: Optional[PlayerSprite] = None

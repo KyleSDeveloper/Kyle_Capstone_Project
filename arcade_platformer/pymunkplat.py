@@ -270,31 +270,42 @@ class GameWindow(arcade.Window):
         self.bullet_list = arcade.SpriteList()
 
         # Map name
-        map_name = ASSETS_PATH / "platform_level_01.tmx"
+        map_name = "assets/images/level_01.tsx"
 
         # Load in TileMap
         tile_map = arcade.load_tilemap(map_name, SPRITE_SCALING_TILES)
 
-        # Check available keys in sprite_lists
+        # Debug prints to check the contents of tile_map
+        print("Tile map loaded successfully.")
         print("Available sprite lists:", tile_map.sprite_lists.keys())
+        for key in tile_map.sprite_lists.keys():
+            print(f"Sprite list '{key}' length: {len(tile_map.sprite_lists[key])}")
 
         # Pull the sprite layers out of the tile map
         self.wall_list = tile_map.sprite_lists.get("ground", arcade.SpriteList())
         self.item_list = tile_map.sprite_lists.get("Dynamic Items", arcade.SpriteList())
-        self.ladder_list = tile_map.sprite_lists.get("Ladders", arcade.SpriteList())
-        self.moving_sprites_list = tile_map.sprite_lists.get("Moving Platforms", arcade.SpriteList())
+        self.ladder_list = tile_map.sprite_lists.get("ladders", arcade.SpriteList())
+        self.moving_sprites_list = tile_map.sprite_lists.get("moving_platforms", arcade.SpriteList())
         self.background_list = tile_map.sprite_lists.get("background", arcade.SpriteList())
         self.goal_list = tile_map.sprite_lists.get("goal", arcade.SpriteList())
         self.coin_list = tile_map.sprite_lists.get("coins", arcade.SpriteList())
+
+        print(f"Wall list length: {len(self.wall_list)}")
+        print(f"Item list length: {len(self.item_list)}")
+        print(f"Ladder list length: {len(self.ladder_list)}")
+        print(f"Moving sprites list length: {len(self.moving_sprites_list)}")
+        print(f"Background list length: {len(self.background_list)}")
+        print(f"Goal list length: {len(self.goal_list)}")
+        print(f"Coin list length: {len(self.coin_list)}")
 
         # Create player sprite
         self.player_sprite = PlayerSprite(self.ladder_list, hit_box_algorithm="Detailed")
 
         # Set player location
         grid_x = 5  # Adjust this value to set the initial x position
-        grid_y = 2.5  # Adjust this value to set the initial y position
-        self.player_sprite.center_x = grid_x * SPRITE_SIZE + SPRITE_SIZE / 2
-        self.player_sprite.center_y = grid_y * SPRITE_SIZE + SPRITE_SIZE / 2
+        grid_y = 5  # Adjust this value to set the initial y position
+        self.player_sprite.center_x = grid_x * SPRITE_SCALING_TILES
+        self.player_sprite.center_y = grid_y * SPRITE_SCALING_TILES
         self.player_list.append(self.player_sprite)
 
         # Set up the physics engine
@@ -463,19 +474,31 @@ class GameWindow(arcade.Window):
             self.physics_engine.set_velocity(moving_sprite, velocity)
 
     def on_draw(self):
-        """ Draw everything """
-        self.clear()
-        self.wall_list.draw()
-        self.ladder_list.draw()
-        self.moving_sprites_list.draw()
-        self.bullet_list.draw()
-        self.item_list.draw()
+        """ Render the screen. """
+        arcade.start_render()
+        # Draw the background
+        if self.background_list:
+            self.background_list.draw()
+        # Draw the walls
+        if self.wall_list:
+            self.wall_list.draw()
+        # Draw the items
+        if self.item_list:
+            self.item_list.draw()
+        # Draw the ladders
+        if self.ladder_list:
+            self.ladder_list.draw()
+        # Draw the moving platforms
+        if self.moving_sprites_list:
+            self.moving_sprites_list.draw()
+        # Draw the goals
+        if self.goal_list:
+            self.goal_list.draw()
+        # Draw the coins
+        if self.coin_list:
+            self.coin_list.draw()
+        # Draw the player
         self.player_list.draw()
-
-        # for item in self.player_list:
-        #     item.draw_hit_box(arcade.color.RED)
-        # for item in self.item_list:
-        #     item.draw_hit_box(arcade.color.RED)
 
 def main():
     """ Main function """

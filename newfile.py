@@ -1,7 +1,6 @@
 import math
 from typing import Optional
 import arcade
-import pathlib
 
 SCREEN_TITLE = "PyMunk Platformer"
 
@@ -71,39 +70,10 @@ BULLET_MASS = 0.1
 
 # Make bullet less affected by gravity
 BULLET_GRAVITY = 300
-# Assets path
-ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "assets"
 
-
-def load_texture_pair(filename, hit_box_algorithm: str = "Simple"):
-    """
-    Load a texture pair, with the second being a mirror image of the first.
-    Useful when doing animations and the character can face left/right.
-    """
-    return [
-        load_texture(filename,
-                     hit_box_algorithm=hit_box_algorithm),
-        load_texture(filename,
-                     flipped_horizontally=True,
-                     hit_box_algorithm=hit_box_algorithm)
-    ]
 
 class PlayerSprite(arcade.Sprite):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.is_on_ladder = False  # Initialize the attribute
-
-        main_path = ":resources:images/animated_characters/female_person/femalePerson"
-        self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
-        self.walk_textures = []
-        for i in range(8):
-            texture = load_texture_pair(f"{main_path}_walk{i}.png")
-            self.walk_textures.append(texture)
-
-        self.texture = self.idle_texture_pair[0]
-
-    # Add any other methods or attributes needed for your player sprite
-
+    """ Player Sprite """
     def __init__(self,
                  ladder_list: arcade.SpriteList,
                  hit_box_algorithm):
@@ -116,21 +86,21 @@ class PlayerSprite(arcade.Sprite):
 
         # Images from Kenney.nl's Character pack
         # main_path = ":resources:images/animated_characters/female_adventurer/femaleAdventurer"
-        main_path = ASSETS_PATH / "images" / "player" / "alienGreen"
+        main_path = ":resources:images/animated_characters/female_person/femalePerson"
         # main_path = ":resources:images/animated_characters/male_person/malePerson"
         # main_path = ":resources:images/animated_characters/male_adventurer/maleAdventurer"
         # main_path = ":resources:images/animated_characters/zombie/zombie"
         # main_path = ":resources:images/animated_characters/robot/robot"
 
         # Load textures for idle standing
-        self.idle_texture_pair = arcade.load_texture_pair(f"{main_path}_stand.png",
+        self.idle_texture_pair = arcade.load_texture_pair(f"{main_path}_idle.png",
                                                           hit_box_algorithm=hit_box_algorithm)
         self.jump_texture_pair = arcade.load_texture_pair(f"{main_path}_jump.png")
-        self.fall_texture_pair = arcade.load_texture_pair(":resources:images/animated_characters/female_person/femalePerson_fall.png")
+        self.fall_texture_pair = arcade.load_texture_pair(f"{main_path}_fall.png")
 
         # Load textures for walking
         self.walk_textures = []
-        for i in range(2):
+        for i in range(8):
             texture = arcade.load_texture_pair(f"{main_path}_walk{i}.png")
             self.walk_textures.append(texture)
 
@@ -226,22 +196,10 @@ class PlayerSprite(arcade.Sprite):
 
             # Advance the walking animation
             self.cur_texture += 1
-            if self.cur_texture >= len(self.walk_textures):
+            if self.cur_texture > 7:
                 self.cur_texture = 0
-
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
-    def update_animation(self, delta_time: float = 1/60):
-        """Update the player's animation."""
-        if self.change_x == 0 and self.change_y == 0:
-            self.texture = self.idle_texture_pair[self.character_face_direction]
-            return
-
-        self.cur_texture += 1
-        if self.cur_texture >= len(self.walk_textures):
-            self.cur_texture = 0
-        self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
-        
 class BulletSprite(arcade.SpriteSolidColor):
     """ Bullet Sprite """
     def pymunk_moved(self, physics_engine, dx, dy, d_angle):
@@ -258,6 +216,9 @@ class GameWindow(arcade.Window):
 
         # Init the parent class
         super().__init__(width, height, title)
+
+        # Initialize the camera
+        self.camera = arcade.Camera(width, height)
 
         # Player sprite
         self.player_sprite: Optional[PlayerSprite] = None
@@ -295,57 +256,91 @@ class GameWindow(arcade.Window):
         # Load in TileMap
         tile_map = arcade.load_tilemap(map_name, SPRITE_SCALING_TILES)
 
-        # Debug prints to check the contents of tile_map
-        print("Tile map loaded successfully.")
-        print("Available sprite lists:", tile_map.sprite_lists.keys())
-        for key in tile_map.sprite_lists.keys():
-            print(f"Sprite list '{key}' length: {len(tile_map.sprite_lists[key])}")
-
         # Pull the sprite layers out of the tile map
-        self.wall_list = tile_map.sprite_lists.get("platforms", arcade.SpriteList())
-        self.item_list = tile_map.sprite_lists.get("Dynamic Items", arcade.SpriteList())
-        self.ladder_list = tile_map.sprite_lists.get("ladders", arcade.SpriteList())
-        self.moving_sprites_list = tile_map.sprite_lists.get("moving_platforms", arcade.SpriteList())
+        self.wall_list = tile_map.sprite_lists["platforms"]
+        self.item_list = tile_map.sprite_lists["coins"]
+        self.ladder_list = tile_map.sprite_lists["ladders"]
+        self.moving_sprites_list = tile_map.sprite_lists['moving_platforms']
 
-        # Ensure all sprites in ladder_list have a texture set
-        for sprite in self.ladder_list:
-            if sprite.texture is None:
-                sprite.texture = arcade.load_texture(":resources:images/tiles/grassMid.png")
+        # Create player sprite
+        self.player_sprite = PlayerSprite(self.ladder_list, hit_box_algorithm="Detailed")
 
-        # Initialize the physics engine
-        self.physics_engine = arcade.PymunkPhysicsEngine()
-
-        # Add sprite lists to the physics engine
-        self.physics_engine.add_sprite_list(self.wall_list, friction=0.6, collision_type="wall", body_type=arcade.PymunkPhysicsEngine.STATIC)
-        self.physics_engine.add_sprite_list(self.ladder_list, friction=0.6, collision_type="ladder", body_type=arcade.PymunkPhysicsEngine.STATIC)
-
-        self.background_list = tile_map.sprite_lists.get("background", arcade.SpriteList())
-        self.goal_list = tile_map.sprite_lists.get("goal", arcade.SpriteList())
-        self.coin_list = tile_map.sprite_lists.get("coins", arcade.SpriteList())
-
-        # Initialize the player sprite
-        self.player_sprite = PlayerSprite(":resources:images/animated_characters/female_person/femalePerson_idle.png", 1)
-        self.player_sprite.center_x = 100  # Set the initial position of the player
-        self.player_sprite.center_y = 100
+        # Set player location
+        grid_x = 1
+        grid_y = 1
+        self.player_sprite.center_x = SPRITE_SIZE * grid_x + SPRITE_SIZE / 2
+        self.player_sprite.center_y = SPRITE_SIZE * grid_y + SPRITE_SIZE / 2
+        # Add to player sprite list
         self.player_list.append(self.player_sprite)
 
-        # Add the player sprite to the physics engine
-        self.physics_engine.add_sprite(self.player_sprite, mass=1, friction=0.6, collision_type="player")
+        # --- Pymunk Physics Engine Setup ---
 
-        # Add the moving sprites to the physics engine
-        for moving_sprite in self.moving_sprites_list:
-            self.physics_engine.add_sprite(moving_sprite, mass=1, friction=0.6, collision_type="moving_platform")
+        # The default damping for every object controls the percent of velocity
+        # the object will keep each second. A value of 1.0 is no speed loss,
+        # 0.9 is 10% per second, 0.1 is 90% per second.
+        # For top-down games, this is basically the friction for moving objects.
+        # For platformers with gravity, this should probably be set to 1.0.
+        # Default value is 1.0 if not specified.
+        damping = DEFAULT_DAMPING
 
-        # Initialize the camera
-        self.camera = arcade.Camera(self.width, self.height)
+        # Set the gravity. (0, 0) is good for outer space and top-down.
+        gravity = (0, -GRAVITY)
 
-        print(f"Wall list length: {len(self.wall_list)}")
-        print(f"Item list length: {len(self.item_list)}")
-        print(f"Ladder list length: {len(self.ladder_list)}")
-        print(f"Moving sprites list length: {len(self.moving_sprites_list)}")
-        print(f"Background list length: {len(self.background_list)}")
-        print(f"Goal list length: {len(self.goal_list)}")
-        print(f"Coin list length: {len(self.coin_list)}")
+        # Create the physics engine
+        self.physics_engine = arcade.PymunkPhysicsEngine(damping=damping,
+                                                         gravity=gravity)
+
+        def wall_hit_handler(bullet_sprite, _wall_sprite, _arbiter, _space, _data):
+            """ Called for bullet/wall collision """
+            bullet_sprite.remove_from_sprite_lists()
+
+        self.physics_engine.add_collision_handler("bullet", "wall", post_handler=wall_hit_handler)
+
+        def item_hit_handler(bullet_sprite, item_sprite, _arbiter, _space, _data):
+            """ Called for bullet/wall collision """
+            bullet_sprite.remove_from_sprite_lists()
+            item_sprite.remove_from_sprite_lists()
+
+        self.physics_engine.add_collision_handler("bullet", "item", post_handler=item_hit_handler)
+
+        # Add the player.
+        # For the player, we set the damping to a lower value, which increases
+        # the damping rate. This prevents the character from traveling too far
+        # after the player lets off the movement keys.
+        # Setting the moment to PymunkPhysicsEngine.MOMENT_INF prevents it from
+        # rotating.
+        # Friction normally goes between 0 (no friction) and 1.0 (high friction)
+        # Friction is between two objects in contact. It is important to remember
+        # in top-down games that friction moving along the 'floor' is controlled
+        # by damping.
+        self.physics_engine.add_sprite(self.player_sprite,
+                                       friction=PLAYER_FRICTION,
+                                       mass=PLAYER_MASS,
+                                       moment=arcade.PymunkPhysicsEngine.MOMENT_INF,
+                                       collision_type="player",
+                                       max_horizontal_velocity=PLAYER_MAX_HORIZONTAL_SPEED,
+                                       max_vertical_velocity=PLAYER_MAX_VERTICAL_SPEED)
+
+        # Create the walls.
+        # By setting the body type to PymunkPhysicsEngine.STATIC the walls can't
+        # move.
+        # Movable objects that respond to forces are PymunkPhysicsEngine.DYNAMIC
+        # PymunkPhysicsEngine.KINEMATIC objects will move, but are assumed to be
+        # repositioned by code and don't respond to physics forces.
+        # Dynamic is default.
+        self.physics_engine.add_sprite_list(self.wall_list,
+                                            friction=WALL_FRICTION,
+                                            collision_type="wall",
+                                            body_type=arcade.PymunkPhysicsEngine.STATIC)
+
+        # Create the items
+        self.physics_engine.add_sprite_list(self.item_list,
+                                            friction=DYNAMIC_ITEM_FRICTION,
+                                            collision_type="item")
+
+        # Add kinematic sprites
+        self.physics_engine.add_sprite_list(self.moving_sprites_list,
+                                            body_type=arcade.PymunkPhysicsEngine.KINEMATIC)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -433,17 +428,6 @@ class GameWindow(arcade.Window):
 
     def on_update(self, delta_time):
         """ Movement and game logic """
-        self.physics_engine.step()
-
-        # Check if the player is on the ground
-        is_on_ground = self.physics_engine.is_on_ground(self.player_sprite)
-
-        # Check if the player is on a ladder
-        is_on_ladder = any(sprite.collides_with_sprite(self.player_sprite) for sprite in self.ladder_list)
-
-        if is_on_ground or is_on_ladder:
-            # Handle the logic when the player is on the ground or on a ladder
-            pass
 
         is_on_ground = self.physics_engine.is_on_ground(self.player_sprite)
         # Update player forces based on keys pressed
@@ -513,22 +497,28 @@ class GameWindow(arcade.Window):
             velocity = (moving_sprite.change_x * 1 / delta_time, moving_sprite.change_y * 1 / delta_time)
             self.physics_engine.set_velocity(moving_sprite, velocity)
 
+        # Update the camera to follow the player
+        self.camera.move_to((self.player_sprite.center_x - self.camera.viewport_width // 2,
+                             self.player_sprite.center_y - self.camera.viewport_height // 2))
+
     def on_draw(self):
-        """ Render the screen. """
-        arcade.start_render()
+        """ Draw everything """
+        self.clear()
 
         # Use the camera
         self.camera.use()
 
-        # Draw all the sprite lists
-        self.background_list.draw()
         self.wall_list.draw()
         self.ladder_list.draw()
         self.moving_sprites_list.draw()
+        self.bullet_list.draw()
         self.item_list.draw()
-        self.goal_list.draw()
-        self.coin_list.draw()
         self.player_list.draw()
+
+        # for item in self.player_list:
+        #     item.draw_hit_box(arcade.color.RED)
+        # for item in self.item_list:
+        #     item.draw_hit_box(arcade.color.RED)
 
 def main():
     """ Main function """

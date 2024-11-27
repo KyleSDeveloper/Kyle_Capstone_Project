@@ -224,12 +224,13 @@ class GameWindow(arcade.Window):
         self.player_sprite: Optional[PlayerSprite] = None
 
         # Sprite lists we need
-        self.player_list: Optional[arcade.SpriteList] = None
-        self.wall_list: Optional[arcade.SpriteList] = None
-        self.bullet_list: Optional[arcade.SpriteList] = None
-        self.item_list: Optional[arcade.SpriteList] = None
-        self.moving_sprites_list: Optional[arcade.SpriteList] = None
-        self.ladder_list: Optional[arcade.SpriteList] = None
+        self.player_list = arcade.SpriteList()
+        self.wall_list = arcade.SpriteList()
+        self.item_list = arcade.SpriteList()
+        self.goal_list = arcade.SpriteList()
+        self.moving_sprites_list = arcade.SpriteList()
+        self.ladder_list = arcade.SpriteList()
+        self.background_list = arcade.SpriteList()
 
         # Track the current state of what key is pressed
         self.left_pressed: bool = False
@@ -260,7 +261,9 @@ class GameWindow(arcade.Window):
         self.wall_list = tile_map.sprite_lists["platforms"]
         self.item_list = tile_map.sprite_lists["coins"]
         self.ladder_list = tile_map.sprite_lists["ladders"]
-        self.moving_sprites_list = tile_map.sprite_lists['moving_platforms']
+        self.goal_list = tile_map.sprite_lists["goal"]
+        self.moving_sprites_list = tile_map.sprite_lists["moving_platforms"]
+        self.background_list = tile_map.sprite_lists["background"]
 
         # Create player sprite
         self.player_sprite = PlayerSprite(self.ladder_list, hit_box_algorithm="Detailed")
@@ -509,7 +512,9 @@ class GameWindow(arcade.Window):
         self.camera.use()
 
         self.wall_list.draw()
+        self.background_list.draw()
         self.ladder_list.draw()
+        self.goal_list.draw()
         self.moving_sprites_list.draw()
         self.bullet_list.draw()
         self.item_list.draw()

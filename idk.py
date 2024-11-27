@@ -85,7 +85,7 @@ class GameWindow(arcade.Window):
         self.bullet_list = arcade.SpriteList()
 
         # Map name
-        map_name = "/home/kyle/Kyle_Capstone_Project/assets/level_01.tmx"
+        map_name = "/home/kyle/Kyle_Capstone_Project/assets/images/level_01.json"
 
         # Load in TileMap
         tile_map = arcade.load_tilemap(map_name, SPRITE_SCALING_TILES)
@@ -93,6 +93,7 @@ class GameWindow(arcade.Window):
         # Pull the sprite layers out of the tile map
         self.wall_list = tile_map.sprite_lists["platforms"]
         self.item_list = tile_map.sprite_lists["Dynamic Items"]
+        self.background_list = tile_map.sprite_lists["background"]
 
         # Create player sprite
         self.player_sprite = arcade.Sprite(":resources:images/animated_characters/female_person/femalePerson_idle.png",
@@ -105,14 +106,7 @@ class GameWindow(arcade.Window):
         # Add to player sprite list
         self.player_list.append(self.player_sprite)
 
-        # --- Pymunk Physics Engine Setup ---
-
-        # The default damping for every object controls the percent of velocity
-        # the object will keep each second. A value of 1.0 is no speed loss,
-        # 0.9 is 10% per second, 0.1 is 90% per second.
-        # For top-down games, this is basically the friction for moving objects.
-        # For platformers with gravity, this should probably be set to 1.0.
-        # Default value is 1.0 if not specified.
+        # Set up the physics engine
         damping = DEFAULT_DAMPING
 
         # Set the gravity. (0, 0) is good for outer space and top-down.
@@ -122,16 +116,7 @@ class GameWindow(arcade.Window):
         self.physics_engine = arcade.PymunkPhysicsEngine(damping=damping,
                                                          gravity=gravity)
 
-        # Add the player.
-        # For the player, we set the damping to a lower value, which increases
-        # the damping rate. This prevents the character from traveling too far
-        # after the player lets off the movement keys.
-        # Setting the moment to PymunkPhysicsEngine.MOMENT_INF prevents it from
-        # rotating.
-        # Friction normally goes between 0 (no friction) and 1.0 (high friction)
-        # Friction is between two objects in contact. It is important to remember
-        # in top-down games that friction moving along the 'floor' is controlled
-        # by damping.
+        # Associate the player with the physics engine
         self.physics_engine.add_sprite(self.player_sprite,
                                        friction=PLAYER_FRICTION,
                                        mass=PLAYER_MASS,
@@ -156,6 +141,10 @@ class GameWindow(arcade.Window):
         self.physics_engine.add_sprite_list(self.item_list,
                                             friction=DYNAMIC_ITEM_FRICTION,
                                             collision_type="item")
+        
+    
+        
+        
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -199,6 +188,7 @@ class GameWindow(arcade.Window):
     def on_draw(self):
         """ Draw everything """
         self.clear()
+        self.background_list.draw()
         self.wall_list.draw()
         self.bullet_list.draw()
         self.item_list.draw()

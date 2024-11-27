@@ -75,18 +75,8 @@ BULLET_GRAVITY = 300
 ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "assets"
 
 
-def load_texture_pair(filename, hit_box_algorithm: str = "Simple"):
-    """
-    Load a texture pair, with the second being a mirror image of the first.
-    Useful when doing animations and the character can face left/right.
-    """
-    return [
-        load_texture(filename,
-                     hit_box_algorithm=hit_box_algorithm),
-        load_texture(filename,
-                     flipped_horizontally=True,
-                     hit_box_algorithm=hit_box_algorithm)
-    ]
+
+    
 
 class PlayerSprite(arcade.Sprite):
     def __init__(self, *args, **kwargs):

@@ -224,6 +224,7 @@ class GameWindow(arcade.Window):
         self.player_sprite: Optional[PlayerSprite] = None
 
         # Sprite lists we need
+        self.wall_list: Optional[arcade.SpriteList] = None
         self.player_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.item_list = arcade.SpriteList()
@@ -267,6 +268,9 @@ class GameWindow(arcade.Window):
 
         # Create player sprite
         self.player_sprite = PlayerSprite(self.ladder_list, hit_box_algorithm="Detailed")
+        self.player_sprite.center_y = SPRITE_SIZE * grid_y + SPRITE_SIZE / 2
+        # Add to player sprite list
+        self.player_list.append(self.player_sprite)
 
         # Set player location
         grid_x = 1
@@ -275,6 +279,11 @@ class GameWindow(arcade.Window):
         self.player_sprite.center_y = SPRITE_SIZE * grid_y + SPRITE_SIZE / 2
         # Add to player sprite list
         self.player_list.append(self.player_sprite)
+
+        # Moving Sprite
+        self.moving_sprites_list = arcade.tilemap.process_layer(map_name,
+                                                                'Moving Platforms',
+                                                                SPRITE_SCALING_TILES)
 
         # --- Pymunk Physics Engine Setup ---
 
@@ -292,6 +301,7 @@ class GameWindow(arcade.Window):
         # Create the physics engine
         self.physics_engine = arcade.PymunkPhysicsEngine(damping=damping,
                                                          gravity=gravity)
+        
 
         def wall_hit_handler(bullet_sprite, _wall_sprite, _arbiter, _space, _data):
             """ Called for bullet/wall collision """

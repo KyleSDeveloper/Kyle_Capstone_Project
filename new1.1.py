@@ -100,7 +100,7 @@ class PlayerSprite(arcade.Sprite):
                  ladder_list: arcade.SpriteList,
                  hit_box_algorithm):
         """ Init """
-        # Let parent initialize
+    
         super().__init__()
 
         # Set our scale

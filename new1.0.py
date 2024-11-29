@@ -1,6 +1,3 @@
-"""
-Example of Pymunk Physics Engine Platformer
-"""
 import math
 from typing import Optional
 import arcade
@@ -73,7 +70,32 @@ BULLET_MASS = 0.1
 
 # Make bullet less affected by gravity
 BULLET_GRAVITY = 300
+ENEMY_MOVE_SPEED = 2
+ENEMY_TEXTURE_CHANGE_DISTANCE = 20
 
+
+class EnemySprite(arcade.Sprite):
+    """ Enemy Sprite """
+    def __init__(self, image, scale):
+        super().__init__(image, scale)
+        self.change_x = ENEMY_MOVE_SPEED
+        self.boundary_left = None
+        self.boundary_right = None
+
+        
+                         
+
+
+
+    def update(self):
+        """ Move the enemy """
+        self.center_x += self.change_x
+
+        # Reverse direction if we hit the boundaries
+        if self.boundary_left is not None and self.left < self.boundary_left:
+            self.change_x *= -1
+        if self.boundary_right is not None and self.right > self.boundary_right:
+            self.change_x *= -1
 
 class PlayerSprite(arcade.Sprite):
     """ Player Sprite """
@@ -81,7 +103,7 @@ class PlayerSprite(arcade.Sprite):
                  ladder_list: arcade.SpriteList,
                  hit_box_algorithm):
         """ Init """
-        # Let parent initialize
+    
         super().__init__()
 
         # Set our scale
@@ -230,6 +252,7 @@ class GameWindow(arcade.Window):
         self.item_list: Optional[arcade.SpriteList] = None
         self.moving_sprites_list: Optional[arcade.SpriteList] = None
         self.ladder_list: Optional[arcade.SpriteList] = None
+        self.enemy_list = arcade.SpriteList()
 
         # Track the current state of what key is pressed
         self.left_pressed: bool = False
@@ -241,12 +264,21 @@ class GameWindow(arcade.Window):
         self.physics_engine: Optional[arcade.PymunkPhysicsEngine] = None
 
         # Set background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color(arcade.color.SILVER_LAKE_BLUE)
 
     def setup(self):
         """ Set up everything with the game """
                 # Set up the Camera
         self.camera = arcade.Camera(self.width, self.height)
+
+        # Add enemies
+        enemy = EnemySprite("assets/images/Platformer Pack Redux (360 assets) (1)/PNG/Enemies/fly.png", 0.5)
+        enemy.center_x = 300
+        enemy.center_y = 250
+        enemy.boundary_left = 100
+        enemy.boundary_right = 500
+        self.enemy_list.append(enemy)
+
 
         # Create the sprite lists
         self.player_list = arcade.SpriteList()
@@ -456,6 +488,7 @@ class GameWindow(arcade.Window):
         self.physics_engine.update()
 
 
+
         # Position the camera
 
         self.center_camera_to_player()
@@ -463,7 +496,7 @@ class GameWindow(arcade.Window):
     def on_update(self, delta_time):
         """ Movement and game logic """
         
-
+        self.enemy_list.update()
         is_on_ground = self.physics_engine.is_on_ground(self.player_sprite)
         # Update player forces based on keys pressed
         if self.left_pressed and not self.right_pressed:
@@ -547,6 +580,7 @@ class GameWindow(arcade.Window):
         self.bullet_list.draw()
         self.item_list.draw()
         self.player_list.draw()
+        self.enemy_list.draw()
         
 
         # for item in self.player_list:

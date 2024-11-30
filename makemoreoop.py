@@ -74,6 +74,8 @@ ENEMY_MOVE_SPEED = 2
 ENEMY_TEXTURE_CHANGE_DISTANCE = 20
 
 
+
+
 class EnemySprite(arcade.Sprite):
     """ Enemy Sprite """
     def __init__(self, image, dead_image, scale):

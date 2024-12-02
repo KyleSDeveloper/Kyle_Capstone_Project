@@ -303,6 +303,8 @@ class GameWindow(arcade.Window):
         # Map name
         map_name = "assets/images/level_01.json"
 
+        
+
         # Load in TileMap
         tile_map = arcade.load_tilemap(map_name, SPRITE_SCALING_TILES)
 

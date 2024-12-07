@@ -566,7 +566,9 @@ class GameWindow(arcade.Window):
 
         # Check for collisions
         if arcade.check_for_collision_with_list(self.player_sprite, self.enemy_list):
-            self.player_die()
+            self.player_die() 
+        if arcade.check_for_collision_with_list(self.player_sprite, self.goal_list):
+            self.congratulate_player()
 
         # For each moving sprite, see if we've reached a boundary and need to
         # reverse course.
@@ -596,6 +598,10 @@ class GameWindow(arcade.Window):
 
         # Position the camera
         self.center_camera_to_player()
+
+    def congratulate_player(self):
+        print("Congratulations! You've passed the level!")
+        self.close()
 
     def on_draw(self):
         """ Draw everything """

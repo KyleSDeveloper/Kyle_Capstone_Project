@@ -235,6 +235,8 @@ class PlayerSprite(arcade.Sprite):
                 self.cur_texture = 0
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
+
+
 class BulletSprite(arcade.SpriteSolidColor):
     """ Bullet Sprite """
     def pymunk_moved(self, physics_engine, dx, dy, d_angle):
@@ -242,6 +244,30 @@ class BulletSprite(arcade.SpriteSolidColor):
         # If the bullet falls below the screen, remove it
         if self.center_y < -100:
             self.remove_from_sprite_lists()
+
+class MainMenu(arcade.View):
+    """Class that manages the 'menu' view."""
+
+    def on_show_view(self):
+        """Called when switching to this view."""
+        arcade.set_background_color(arcade.color.WHITE)
+
+    def on_draw(self):
+        """Draw the menu"""
+        self.clear()
+        arcade.draw_text(
+            "Main Menu - Click to play",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2,
+            arcade.color.BLACK,
+            font_size=30,
+            anchor_x="center",
+        )
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        """Use a mouse press to advance to the 'game' view."""
+        game_view = GameWindow()
+        self.window.show_view(game_view)
 
 class GameWindow(arcade.Window):
     """ Main Window """
@@ -275,6 +301,14 @@ class GameWindow(arcade.Window):
 
         # Set background color
         arcade.set_background_color(arcade.color.SILVER_LAKE_BLUE)
+
+    @property
+    def current_view(self):
+        return self._current_view
+
+    @current_view.setter
+    def current_view(self, view):
+        self._current_view = view
 
     def setup(self):
         """ Set up everything with the game """
@@ -323,14 +357,7 @@ class GameWindow(arcade.Window):
         # Add to player sprite list
         self.player_list.append(self.player_sprite)
 
-        # --- Pymunk Physics Engine Setup ---
-
-        # The default damping for every object controls the percent of velocity
-        # the object will keep each second. A value of 1.0 is no speed loss,
-        # 0.9 is 10% per second, 0.1 is 90% per second.
-        # For top-down games, this is basically the friction for moving objects.
-        # For platformers with gravity, this should probably be set to 1.0.
-        # Default value is 1.0 if not specified.
+       
         damping = DEFAULT_DAMPING
 
         # Set the gravity. (0, 0) is good for outer space and top-down.
@@ -353,16 +380,7 @@ class GameWindow(arcade.Window):
 
         self.physics_engine.add_collision_handler("bullet", "item", post_handler=item_hit_handler)
 
-        # Add the player.
-        # For the player, we set the damping to a lower value, which increases
-        # the damping rate. This prevents the character from traveling too far
-        # after the player lets off the movement keys.
-        # Setting the moment to PymunkPhysicsEngine.MOMENT_INF prevents it from
-        # rotating.
-        # Friction normally goes between 0 (no friction) and 1.0 (high friction)
-        # Friction is between two objects in contact. It is important to remember
-        # in top-down games that friction moving along the 'floor' is controlled
-        # by damping.
+        
         self.physics_engine.add_sprite(self.player_sprite,
                                        friction=PLAYER_FRICTION,
                                        mass=PLAYER_MASS,
@@ -371,13 +389,7 @@ class GameWindow(arcade.Window):
                                        max_horizontal_velocity=PLAYER_MAX_HORIZONTAL_SPEED,
                                        max_vertical_velocity=PLAYER_MAX_VERTICAL_SPEED)
 
-        # Create the walls.
-        # By setting the body type to PymunkPhysicsEngine.STATIC the walls can't
-        # move.
-        # Movable objects that respond to forces are PymunkPhysicsEngine.DYNAMIC
-        # PymunkPhysicsEngine.KINEMATIC objects will move, but are assumed to be
-        # repositioned by code and don't respond to physics forces.
-        # Dynamic is default.
+        
         self.physics_engine.add_sprite_list(self.wall_list,
                                             friction=WALL_FRICTION,
                                             collision_type="wall",
@@ -510,11 +522,9 @@ class GameWindow(arcade.Window):
         # Position the camera
 
         self.center_camera_to_player()
+    
 
-    def player_die(self):
-        """ Handle the player's death """
-        print("Player has died!")
-        self.close()
+    
 
     def on_update(self, delta_time):
         """ Movement and game logic """
@@ -603,8 +613,13 @@ class GameWindow(arcade.Window):
         print("Congratulations! You've passed the level!")
         self.close()
 
+    def player_die(self):
+        game_over_view = GameOverView()
+        self.show_view(game_over_view)
+        self.current_view = game_over_view  # Set current_view to GameOverView
+
     def on_draw(self):
-        """ Draw everything """
+        """ Draw everything """ 
                 # Activate our Camera
         self.background_list.draw()
         self.camera.use()
@@ -618,12 +633,47 @@ class GameWindow(arcade.Window):
         self.player_list.draw()
         self.enemy_list.draw()
 
+class GameOverView(arcade.View):
+    """Class to manage the game overview"""
+
+    def on_show(self):
+        """Called when switching to this view"""
+        arcade.set_background_color(arcade.color.BLACK)
+
+    def on_draw(self):
+        """Draw the game overview"""
+        self.clear()
+        arcade.draw_text(
+            "Game Over",
+            self.window.width / 2,
+            self.window.height / 2 + 50,
+            arcade.color.WHITE,
+            50,
+            anchor_x="center",
+        )
+        arcade.draw_text(
+            "Click to try again",
+            self.window.width / 2,
+            self.window.height / 2 - 50,
+            arcade.color.WHITE,
+            20,
+            anchor_x="center",
+        )
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        """Use a mouse press to advance to the 'game' view."""
+        game_view = GameWindow(self.window.width, self.window.height, "Arcade Game")
+        game_view.setup()
+        self.window.show_view(game_view)
+
 
 
 
 def main():
     """ Main function """
     window = GameWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    menu_view = MainMenu()
+    window.show_view(menu_view)
     window.setup()
     arcade.run()
 

@@ -7,27 +7,28 @@ from main import BulletSprite
 from typing import Optional
 
 class TitleView(arcade.View):
-    def __init__(self):
-        super().__init__()
+    """Class that manages the 'menu' view."""
 
-    def on_show(self):
-        """ This is run once when we switch to this view """
-        arcade.set_background_color(arcade.color.AMAZON)
+    def on_show_view(self):
+        """Called when switching to this view."""
+        arcade.set_background_color(arcade.color.WHITE)
 
     def on_draw(self):
-        """ Draw the title screen """
+        """Draw the menu"""
         self.clear()
-        arcade.draw_text("My Game", self.window.width / 2, self.window.height / 2,
-                         arcade.color.WHITE, font_size=50, anchor_x="center")
-        arcade.draw_text("Press SPACE to start", self.window.width / 2, self.window.height / 2 - 75,
-                         arcade.color.WHITE, font_size=20, anchor_x="center")
+        arcade.draw_text(
+            "Main Menu - Click to play",
+            game.SCREEN_WIDTH / 2,
+            game.SCREEN_HEIGHT / 2,
+            arcade.color.BLACK,
+            font_size=30,
+            anchor_x="center",
+        )
 
-    def on_key_press(self, key, modifiers):
-        """ If the user presses the space key, start the game. """
-        if key == arcade.key.SPACE:
-            game_view = GameWindow()
-            game_view.setup()
-            self.window.show_view(game_view)
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        """Use a mouse press to advance to the 'game' view."""
+        game_view = GameWindow()
+        self.window.show_view(game_view)
 
 class GameWindow(arcade.Window):
     """ Main Window """
@@ -77,12 +78,9 @@ class GameWindow(arcade.Window):
         enemy.boundary_right = 500
         self.enemy_list.append(enemy)
 
-
         # Create the sprite lists
         self.player_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
-
-        
 
         # Map name
         map_name = "assets/images/level_01.json"
@@ -258,8 +256,7 @@ class GameWindow(arcade.Window):
 
         # Update player forces based on keys pressed
         if self.left_pressed and not self.right_pressed:
-            # Create a force to the left. Ap
-            # ply it.
+            # Create a force to the left. Apply it.
             if is_on_ground or self.player_sprite.is_on_ladder:
                 force = (-game.PLAYER_MOVE_FORCE_ON_GROUND, 0)
             else:

@@ -1,7 +1,6 @@
-
 import arcade
 import constants as game
-
+from typing import Optional
 
 
 class EnemySprite(arcade.Sprite):

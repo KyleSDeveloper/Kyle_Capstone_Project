@@ -12,17 +12,16 @@ class EnemySprite(arcade.Sprite):
         self.boundary_right = None
         self.dead = False
         self.dead_texture = arcade.load_texture(dead_image)
-        self.original_texture = arcade.load_texture(image)  # Ensure original_texture is loaded correctly
+        self.original_texture = arcade.load_texture(image)  
 
     def update(self):
         """ Move the enemy """
         if not self.dead:
             self.center_x += self.change_x
 
-            # Reverse direction if we hit the boundaries
             if self.boundary_left is not None and self.center_x < self.boundary_left:
                 self.change_x *= -1
-                if isinstance(self.original_texture.name, str):  # Use 'name' instead of 'image'
+                if isinstance(self.original_texture.name, str): 
                     self.texture = arcade.load_texture(self.original_texture.name, flipped_horizontally=True)
                 else:
                     print("Error: original_texture.name is not a valid path string")

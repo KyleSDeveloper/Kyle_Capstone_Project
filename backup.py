@@ -50,13 +50,7 @@ class PlayerSprite(arcade.Sprite):
         # Set our scale
         self.scale = game.SPRITE_SCALING_PLAYER
 
-        # Images from Kenney.nl's Character pack
-        # main_path = ":resources:images/animated_characters/female_adventurer/femaleAdventurer"
         main_path = ":resources:images/animated_characters/female_person/femalePerson"
-        # main_path = ":resources:images/animated_characters/male_person/malePerson"
-        # main_path = ":resources:images/animated_characters/male_adventurer/maleAdventurer"
-        # main_path = ":resources:images/animated_characters/zombie/zombie"
-        # main_path = ":resources:images/animated_characters/robot/robot"
 
         # Load textures for idle standing
         self.idle_texture_pair = arcade.load_texture_pair(f"{main_path}_idle.png",
@@ -510,9 +504,6 @@ class GameWindow(arcade.Window):
         self.goal_list.draw()
         self.player_list.draw()
         self.enemy_list.draw()
-
-
-
 
 def main():
     """ Main function """

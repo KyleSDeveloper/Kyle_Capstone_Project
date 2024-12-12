@@ -44,9 +44,9 @@ PLAYER_MOVE_FORCE_ON_GROUND = 8000
 
 # Force applied when moving left/right in the air
 PLAYER_MOVE_FORCE_IN_AIR = 900
-
+PLAYER_CLIMB_FORCE = 5000
 # Strength of a jump
-PLAYER_JUMP_IMPULSE = 1800
+PLAYER_JUMP_IMPULSE = 1000
 
 # Close enough to not-moving to have the animation go to idle.
 DEAD_ZONE = 0.1

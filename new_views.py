@@ -1,43 +1,161 @@
 import arcade
 import math
 import constants as game
-from main import PlayerSprite
-from main import EnemySprite
-from main import BulletSprite
+from main import PlayerSprite, EnemySprite, BulletSprite
 from typing import Optional
 
 class TitleView(arcade.View):
-    """Class that manages the 'menu' view."""
+    """Displays a title screen and prompts the user to begin the game.
+    Provides a way to show instructions and start the game.
+    """
+    def __init__(self) -> None:
+        super().__init__()
 
-    def on_show_view(self):
-        """Called when switching to this view."""
-        arcade.set_background_color(arcade.color.WHITE)
+        # Find the title image in the images folder
+        title_image_path = "assets/images/title_image.png"
+        # Load our title image
+        self.title_image = arcade.load_texture(title_image_path)
+        # Set our display timer
+        self.display_timer = 3.0
+        # Are we showing the instructions?
+        self.show_instructions = False
 
-    def on_draw(self):
-        """Draw the menu"""
-        self.clear()
-        arcade.draw_text(
-            "Main Menu - Click to play",
-            game.SCREEN_WIDTH / 2,
-            game.SCREEN_HEIGHT / 2,
-            arcade.color.BLACK,
-            font_size=30,
-            anchor_x="center",
+    def on_draw(self) -> None:
+    # Start the rendering loop
+        arcade.start_render()
+
+        # Draw a rectangle filled with our title image
+        arcade.draw_texture_rectangle(
+            center_x=game.SCREEN_WIDTH / 2,
+            center_y=game.SCREEN_HEIGHT / 2,
+            width=game.SCREEN_WIDTH,
+            height=game.SCREEN_HEIGHT,
+            texture=self.title_image,
         )
 
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
-        game_view = GameView()
-        self.window.show_view(game_view)
+        # Should we show our instructions?
+        if self.show_instructions:
+            arcade.draw_text(
+                "Enter to Start | I for Instructions",
+                start_x=100,
+                start_y=220,
+                color=arcade.color.INDIGO,
+                font_size=40,
+            )
+        
+    def on_key_press(self, key: int, modifiers: int) -> None:
+        """Resume the game when the user presses ESC again
+
+        Arguments:
+            key -- Which key was pressed
+            modifiers -- What modifiers were active
+        """
+        if key == arcade.key.RETURN:
+            game_view = GameView()
+            game_view.setup()
+            self.window.show_view(game_view)
+        elif key == arcade.key.I:
+            instructions_view = InstructionsView()
+            self.window.show_view(instructions_view)
+
+class InstructionsView(arcade.View):
+    """Show instructions to the player"""
+
+    def __init__(self) -> None:
+        """Create instructions screen"""
+        super().__init__()
+
+        # Find the instructions image in the image folder
+        instructions_image_path = "assets/images/instructions_image.png"
+
+        # Load our title image
+        self.instructions_image = arcade.load_texture(instructions_image_path)
+
+    def on_draw(self) -> None:
+        # Start the rendering loop
+        arcade.start_render()
+
+        # Draw a rectangle filled with the instructions image
+        arcade.draw_texture_rectangle(
+            center_x=game.SCREEN_WIDTH / 2,
+            center_y=game.SCREEN_HEIGHT / 2,
+            width=game.SCREEN_WIDTH,
+            height=game.SCREEN_HEIGHT,
+            texture=self.instructions_image,
+        )
+
+    def on_key_press(self, key: int, modifiers: int) -> None:
+        """Start the game when the user presses Enter
+
+        Arguments:
+            key -- Which key was pressed
+            modifiers -- What modifiers were active
+        """
+        if key == arcade.key.RETURN:
+            game_view = GameView()
+            game_view.setup()
+            self.window.show_view(game_view)
+
+        elif key == arcade.key.ESCAPE:
+            title_view = TitleView()
+            self.window.show_view(title_view)
+
+# Pause view, used when the player pauses the game
+class PauseView(arcade.View):
+    """Shown when the game is paused"""
+
+    def __init__(self, game_view: arcade.View) -> None:
+        """Create the pause screen"""
+        # Initialize the parent
+        super().__init__()
+
+        # Store a reference to the underlying view
+        self.game_view = game_view
+
+        # Store a semi-transparent color to use as an overlay
+        self.fill_color = arcade.make_transparent_color(
+            arcade.color.WHITE, transparency=150
+        )
+
+    def on_draw(self) -> None:
+        """Draw the underlying screen, blurred, then the Paused text"""
+
+        self.game_view.on_draw()
+
+        arcade.draw_lrtb_rectangle_filled(
+            left=self.game_view.view_left,
+            right=self.game_view.view_left + game.SCREEN_WIDTH,
+            top=self.game_view.view_bottom + game.SCREEN_HEIGHT,
+            bottom=self.game_view.view_bottom,
+            color=self.fill_color,
+        )
+
+        # Now show the Pause text
+        arcade.draw_text(
+            "PAUSED - ESC TO CONTINUE",
+            start_x=self.game_view.view_left + 180,
+            start_y=self.game_view.view_bottom + 300,
+            color=arcade.color.INDIGO,
+            font_size=40,
+        )
+
+    def on_key_press(self, key: int, modifiers: int) -> None:
+        """Resume the game when the user presses ESC again
+
+        Arguments:
+            key -- Which key was pressed
+            modifiers -- What modifiers were active
+        """
+        if key == arcade.key.ESCAPE:
+            self.window.show_view(self.game_view)
 
 class GameView(arcade.View):
     """ Main Window """
-
     def __init__(self):
-        """ Create the variables """
-        # Init the parent class
         super().__init__()
-        
+        self.display_timer = 0
+        self.view_left = 0
+        self.view_bottom = 0
         # Player sprite
         self.player_sprite: Optional[PlayerSprite] = None
         self.camera = None
@@ -154,6 +272,7 @@ class GameView(arcade.View):
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
+    
         if key == arcade.key.LEFT:
             self.left_pressed = True
         elif key == arcade.key.RIGHT:
@@ -164,6 +283,11 @@ class GameView(arcade.View):
                 impulse = (0, game.PLAYER_JUMP_IMPULSE)
                 self.physics_engine.apply_impulse(self.player_sprite, impulse)
                 self.player_sprite.jump_count += 1  # Increment jump count
+        # Did the user want to pause?
+        elif key == arcade.key.ESCAPE:
+            # Pass the current view to preserve this view's state
+            pause = PauseView(self)
+            self.window.show_view(pause)
         elif key == arcade.key.UP:
             self.up_pressed = True
         elif key == arcade.key.DOWN:
@@ -249,6 +373,13 @@ class GameView(arcade.View):
 
     def on_update(self, delta_time):
         """Movement and game logic"""
+        if self.display_timer < 0:
+
+            # Toggle whether to show the instructions
+            self.show_instructions = not self.show_instructions
+
+            # And reset the timer so the instructions flash slowly
+            self.display_timer = 1.0
 
         is_on_ground = self.physics_engine.is_on_ground(self.player_sprite)
         if is_on_ground:

@@ -171,12 +171,11 @@ class BulletSprite(arcade.SpriteSolidColor):
 
 
 def main():
-    from new_views import GameView
+    from new_views import TitleView
     """ Main function """
     window = arcade.Window(game.SCREEN_WIDTH, game.SCREEN_HEIGHT, game.SCREEN_TITLE)
-    game_view = GameView()
-    game_view.setup()
-    window.show_view(game_view)
+    title_view = TitleView()
+    window.show_view(title_view)
     arcade.run()
 
 

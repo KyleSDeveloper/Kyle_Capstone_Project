@@ -27,16 +27,16 @@ class TitleView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         """Use a mouse press to advance to the 'game' view."""
-        game_view = GameWindow()
+        game_view = GameView()
         self.window.show_view(game_view)
 
-class GameWindow(arcade.Window):
+class GameView(arcade.View):
     """ Main Window """
 
-    def __init__(self, width, height, title):
+    def __init__(self):
         """ Create the variables """
         # Init the parent class
-        super().__init__(width, height, title)
+        super().__init__()
         
         # Player sprite
         self.player_sprite: Optional[PlayerSprite] = None
@@ -66,7 +66,7 @@ class GameWindow(arcade.Window):
     def setup(self):
         """ Set up everything with the game """
                 # Set up the Camera
-        self.camera = arcade.Camera(self.width, self.height)
+        self.camera = arcade.Camera(self.window.width, self.window.height)
 
         # Add enemies
         enemy = EnemySprite("assets/images/Platformer Pack Redux (360 assets) (1)/PNG/Enemies/fly.png", 

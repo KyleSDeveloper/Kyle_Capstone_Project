@@ -201,7 +201,7 @@ class GameView(arcade.View):
         self.bullet_list = arcade.SpriteList()
 
         # Map name
-        map_name = "assets/images/level_01.json"
+        map_name = game.ASSETS_PATH / "images" / "level_01.json"
 
         # Load in TileMap
         tile_map = arcade.load_tilemap(map_name, game.SPRITE_SCALING_TILES)

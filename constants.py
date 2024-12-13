@@ -1,3 +1,5 @@
+import pathlib
+
 SCREEN_TITLE = "PyMunk Platformer"
 
 # How big are our image tiles?
@@ -68,4 +70,7 @@ BULLET_MASS = 0.1
 BULLET_GRAVITY = 300
 ENEMY_MOVE_SPEED = 2
 ENEMY_TEXTURE_CHANGE_DISTANCE = 20
+
+# Assets path
+ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "Kyle_Capstone_Project-1" / "assets"
 

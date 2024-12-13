@@ -159,6 +159,8 @@ class GameView(arcade.View):
         # Player sprite
         self.player_sprite: Optional[PlayerSprite] = None
         self.camera = None
+        self.level = 1
+        
 
         # Sprite lists we need
         self.player_list: Optional[arcade.SpriteList] = None
@@ -201,10 +203,12 @@ class GameView(arcade.View):
         self.bullet_list = arcade.SpriteList()
 
         # Map name
-        map_name = game.ASSETS_PATH / "images" / "level_01.json"
+        map_name = f"level_{self.level}.json"
+        map_path = game.ASSETS_PATH / "images" / map_name
+        
 
         # Load in TileMap
-        tile_map = arcade.load_tilemap(map_name, game.SPRITE_SCALING_TILES)
+        tile_map = arcade.load_tilemap(map_path, game.SPRITE_SCALING_TILES)
 
         # Pull the sprite layers out of the tile map
         self.wall_list = tile_map.sprite_lists["Platforms"]

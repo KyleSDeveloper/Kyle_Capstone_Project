@@ -1,7 +1,7 @@
 import arcade
 import math
 import constants as game
-from main import PlayerSprite, EnemySprite, BulletSprite
+from main import PlayerSprite, BulletSprite
 from typing import Optional
 
 class TitleView(arcade.View):
@@ -188,15 +188,7 @@ class GameView(arcade.View):
                 # Set up the Camera
         self.camera = arcade.Camera(self.window.width, self.window.height)
 
-        # Add enemies
-        enemy = EnemySprite("assets/images/Platformer Pack Redux (360 assets) (1)/PNG/Enemies/fly.png", 
-                            "assets/images/Platformer Pack Redux (360 assets) (1)/PNG/Enemies/fly_move.png", 
-                            scale=0.5)
-        enemy.center_x = 300
-        enemy.center_y = 250
-        enemy.boundary_left = 100
-        enemy.boundary_right = 500
-        self.enemy_list.append(enemy)
+        
 
         # Create the sprite lists
         self.player_list = arcade.SpriteList()
@@ -330,11 +322,8 @@ class GameView(arcade.View):
         y_diff = dest_y - start_y
         angle = math.atan2(y_diff, x_diff)
 
-        # What is the 1/2 size of this sprite, so we can figure out how far
-        # away to spawn the bullet
         size = max(self.player_sprite.width, self.player_sprite.height) / 2
 
-        # Use angle to to spawn bullet away from player in proper direction
         bullet.center_x += size * math.cos(angle)
         bullet.center_y += size * math.sin(angle)
 
@@ -343,7 +332,6 @@ class GameView(arcade.View):
 
         bullet_gravity = (0, -game.BULLET_GRAVITY)
 
-        # Add the sprite. This needs to be done AFTER setting the fields above.
         self.physics_engine.add_sprite(bullet,
                                        mass=game.BULLET_MASS,
                                        damping=1.0,
@@ -391,7 +379,7 @@ class GameView(arcade.View):
 
         # Update player forces based on keys pressed
         if self.left_pressed and not self.right_pressed:
-            # Create a force to the left. Apply it.
+    
             if is_on_ground or self.player_sprite.is_on_ladder:
                 force = (-game.PLAYER_MOVE_FORCE_ON_GROUND, 0)
             else:

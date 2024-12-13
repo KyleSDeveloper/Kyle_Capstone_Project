@@ -1,40 +1,7 @@
 import math
-from typing import Optional
 import arcade
 import constants as game
 
-
-class EnemySprite(arcade.Sprite):
-    """ Enemy Sprite """
-    def __init__(self, image, dead_image, scale):
-        super().__init__(image, scale)
-        self.change_x = -game.ENEMY_MOVE_SPEED
-        self.boundary_left = None
-        self.boundary_right = None
-        self.dead = False
-        self.dead_texture = arcade.load_texture(dead_image)
-        self.original_texture = arcade.load_texture(image)  
-
-    def update(self):
-        """ Move the enemy """
-        if not self.dead:
-            self.center_x += self.change_x
-
-            if self.boundary_left is not None and self.center_x < self.boundary_left:
-                self.change_x *= -1
-                if isinstance(self.original_texture.name, str): 
-                    self.texture = arcade.load_texture(self.original_texture.name, flipped_horizontally=True)
-                else:
-                    print("Error: original_texture.name is not a valid path string")
-            if self.boundary_right is not None and self.center_x > self.boundary_right:
-                self.change_x *= -1
-                self.texture = self.original_texture
-        else:
-            self.texture = self.dead_texture
-
-    def kill(self):
-        """ Mark the enemy as dead """
-        self.dead = True
 
 class PlayerSprite(arcade.Sprite):
     """ Player Sprite """

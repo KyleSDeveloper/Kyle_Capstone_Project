@@ -1,7 +1,7 @@
 import arcade
 import math
 import constants as game
-from main import PlayerSprite, BulletSprite
+from entities import Player
 from typing import Optional
 
 class TitleView(arcade.View):
@@ -65,7 +65,6 @@ class InstructionsView(arcade.View):
         """Create instructions screen"""
         super().__init__()
 
-        # Find the instructions image in the image folder
         instructions_image_path = "assets/images/instructions_image.png"
 
         # Load our title image
@@ -156,13 +155,13 @@ class GameView(arcade.View):
         self.display_timer = 0
         self.view_left = 0
         self.view_bottom = 0
-        # Player sprite
-        self.player_sprite: Optional[PlayerSprite] = None
-        self.camera = None
         self.level = 1
         
-
-        # Sprite lists we need
+        # Player sprite
+        self.player_sprite: Optional[Player] = None
+        self.camera = None
+        
+        # Sprite lists
         self.player_list: Optional[arcade.SpriteList] = None
         self.wall_list: Optional[arcade.SpriteList] = None
         self.bullet_list: Optional[arcade.SpriteList] = None
@@ -170,6 +169,7 @@ class GameView(arcade.View):
         self.moving_sprites_list: Optional[arcade.SpriteList] = None
         self.ladder_list: Optional[arcade.SpriteList] = None
         self.enemy_list = arcade.SpriteList()
+        self.goal_list: Optional[arcade.SpriteList] = None
 
         # Track the current state of what key is pressed
         self.left_pressed: bool = False
@@ -185,10 +185,8 @@ class GameView(arcade.View):
 
     def setup(self):
         """ Set up everything with the game """
-                # Set up the Camera
+        # Set up the Camera
         self.camera = arcade.Camera(self.window.width, self.window.height)
-
-        
 
         # Create the sprite lists
         self.player_list = arcade.SpriteList()
@@ -196,9 +194,8 @@ class GameView(arcade.View):
 
         # Map name
         map_name = f"level_{self.level}.json"
-        map_path = game.ASSETS_PATH / "images" / map_name
+        map_path = game.ASSETS_PATH / "maps" / map_name
         
-
         # Load in TileMap
         tile_map = arcade.load_tilemap(map_path, game.SPRITE_SCALING_TILES)
 
@@ -211,7 +208,7 @@ class GameView(arcade.View):
         self.goal_list = tile_map.sprite_lists["Goal"]
 
         # Create player sprite
-        self.player_sprite = PlayerSprite(self.ladder_list, hit_box_algorithm="Detailed")
+        self.player_sprite = Player(self.ladder_list, hit_box_algorithm="Simple")
 
         # Set player location
         grid_x = 1
@@ -221,7 +218,6 @@ class GameView(arcade.View):
         # Add to player sprite list
         self.player_list.append(self.player_sprite)
 
-    
         damping = game.DEFAULT_DAMPING
 
         # Set the gravity. (0, 0) is good for outer space and top-down.
@@ -238,7 +234,7 @@ class GameView(arcade.View):
         self.physics_engine.add_collision_handler("bullet", "wall", post_handler=wall_hit_handler)
 
         def item_hit_handler(bullet_sprite, item_sprite, _arbiter, _space, _data):
-            """ Called for bullet/wall collision """
+            """ Called for bullet/item collision """
             bullet_sprite.remove_from_sprite_lists()
             item_sprite.remove_from_sprite_lists()
 
@@ -313,10 +309,8 @@ class GameView(arcade.View):
         start_y = self.player_sprite.center_y
         bullet.position = self.player_sprite.position
 
-        
         dest_x = x
         dest_y = y
-
 
         x_diff = dest_x - start_x
         y_diff = dest_y - start_y
@@ -344,15 +338,12 @@ class GameView(arcade.View):
         force = (game.BULLET_MOVE_FORCE, 0)
         self.physics_engine.apply_force(bullet, force)
 
-    
-
     def center_camera_to_player(self):
 
         screen_center_x = self.player_sprite.center_x - (self.camera.viewport_width / 2)
         screen_center_y = self.player_sprite.center_y - (
         self.camera.viewport_height / 2
         )
-
 
         if screen_center_x < 0:
            screen_center_x = 0
@@ -362,15 +353,12 @@ class GameView(arcade.View):
 
         self.camera.move_to(player_centered)
 
-
     def on_update(self, delta_time):
         """Movement and game logic"""
         if self.display_timer < 0:
 
-            # Toggle whether to show the instructions
             self.show_instructions = not self.show_instructions
 
-            # And reset the timer so the instructions flash slowly
             self.display_timer = 1.0
 
         is_on_ground = self.physics_engine.is_on_ground(self.player_sprite)
@@ -439,6 +427,11 @@ class GameView(arcade.View):
             self.physics_engine.set_velocity(moving_sprite, velocity)
 
         self.center_camera_to_player()
+
+        # Check if player reached the goal
+        if arcade.check_for_collision_with_list(self.player_sprite, self.goal_list):
+            self.level += 1
+            self.setup()
 
     def on_draw(self):
         """ Draw everything """

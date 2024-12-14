@@ -1,33 +1,170 @@
 import arcade
+import constants as game
 
 class Entity(arcade.Sprite):
-    """ Base class for all entities in the game """
-    def __init__(self, image, scale, hit_box_algorithm="Simple"):
-        super().__init__(image, scale, hit_box_algorithm=hit_box_algorithm)
-        self.change_x = 0
-        self.change_y = 0
-        self.boundary_left = None
-        self.boundary_right = None
-        self.boundary_top = None
-        self.boundary_bottom = None
-        self.dead = False
+    """ Player Sprite """
+    def __init__(self, name_folder, name_file):
+        """ Init """
+        # parent initialize
+        super().__init__()
 
-    def update(self):
-        """ Update the entity's position and handle boundaries """
-        if not self.dead:
-            self.center_x += self.change_x
-            self.center_y += self.change_y
+        # Set our scale
+        self.scale = game.SPRITE_SCALING_PLAYER
 
-            # Reverse direction if we hit the boundaries
-            if self.boundary_left is not None and self.center_x < self.boundary_left:
-                self.change_x *= -1
-            if self.boundary_right is not None and self.center_x > self.boundary_right:
-                self.change_x *= -1
-            if self.boundary_top is not None and self.center_y > self.boundary_top:
-                self.change_y *= -1
-            if self.boundary_bottom is not None and self.center_y < self.boundary_bottom:
-                self.change_y *= -1
+        main_path = f":resources:images/animated_characters/{name_folder}/{name_file}"
 
-    def kill(self):
-        """ Mark the entity as dead """
-        self.dead = True
+        # Load textures for different actions
+        self.idle_texture_pair = arcade.load_texture_pair(f"{main_path}_idle.png")
+        self.jump_texture_pair = arcade.load_texture_pair(f"{main_path}_jump.png")
+        self.fall_texture_pair = arcade.load_texture_pair(f"{main_path}_fall.png")
+        self.walk_textures = [arcade.load_texture_pair(f"{main_path}_walk{i}.png") for i in range(8)]
+        self.climbing_textures = [arcade.load_texture(f"{main_path}_climb0.png"), arcade.load_texture(f"{main_path}_climb1.png")]
+
+        # Set the initial texture
+        self.texture = self.idle_texture_pair[0]
+
+        # Hit box will be set based on the first image used.
+        self.hit_box = self.texture.hit_box_points
+
+        # Default to face-right
+        self.character_face_direction = game.RIGHT_FACING
+
+        # Index of our current texture
+        self.cur_texture = 0
+
+        # How far have we traveled horizontally since changing the texture
+        self.x_odometer = 0
+        self.y_odometer = 0
+
+    def pymunk_moved(self, physics_engine, dx, dy, d_angle):
+        """ Handle being moved by the pymunk engine """
+        # Figure out if we need to face left or right
+        if dx < -game.DEAD_ZONE and self.character_face_direction == game.RIGHT_FACING:
+            self.character_face_direction = game.LEFT_FACING
+        elif dx > game.DEAD_ZONE and self.character_face_direction == game.LEFT_FACING:
+            self.character_face_direction = game.RIGHT_FACING
+
+        # Are we on the ground?
+        is_on_ground = physics_engine.is_on_ground(self)
+
+        # Add to the odometer how far we've moved
+        self.x_odometer += dx
+
+        # Jumping animation
+        if not is_on_ground:
+            if dy > game.DEAD_ZONE:
+                self.texture = self.jump_texture_pair[self.character_face_direction]
+                return
+            elif dy < -game.DEAD_ZONE:
+                self.texture = self.fall_texture_pair[self.character_face_direction]
+                return
+
+        # Idle animation
+        if abs(dx) <= game.DEAD_ZONE:
+            self.texture = self.idle_texture_pair[self.character_face_direction]
+            return
+
+        if abs(self.x_odometer) > game.DISTANCE_TO_CHANGE_TEXTURE:
+
+            # Reset the odometer
+            self.x_odometer = 0
+
+            # Advance the walking animation
+            self.cur_texture += 1
+            if self.cur_texture > 7:
+                self.cur_texture = 0
+            self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+
+class Player(Entity):
+    """Player Sprite class."""
+    def __init__(self, ladder_list: arcade.SpriteList, hit_box_algorithm):
+        super().__init__("male_person", "malePerson")
+
+        self.ladder_list = ladder_list
+        self.is_on_ladder = False
+
+    def pymunk_moved(self, physics_engine, dx, dy, d_angle):
+        """ Handle being moved by the pymunk engine """
+        # Figure out if we need to face left or right
+        if dx < -game.DEAD_ZONE and self.character_face_direction == game.RIGHT_FACING:
+            self.character_face_direction = game.LEFT_FACING
+        elif dx > game.DEAD_ZONE and self.character_face_direction == game.LEFT_FACING:
+            self.character_face_direction = game.RIGHT_FACING
+
+        # Are we on the ground?
+        is_on_ground = physics_engine.is_on_ground(self)
+
+        # Are we on a ladder?
+        if len(arcade.check_for_collision_with_list(self, self.ladder_list)) > 0:
+            if not self.is_on_ladder:
+                self.is_on_ladder = True
+                self.pymunk.gravity = (0, 0)
+                self.pymunk.damping = 0.0001
+                self.pymunk.max_vertical_velocity = game.PLAYER_MAX_HORIZONTAL_SPEED
+        else:
+            if self.is_on_ladder:
+                self.pymunk.damping = 1.0
+                self.pymunk.max_vertical_velocity = game.PLAYER_MAX_VERTICAL_SPEED
+                self.is_on_ladder = False
+                self.pymunk.gravity = None
+
+        # Add to the odometer how far we've moved
+        self.x_odometer += dx
+        self.y_odometer += dy
+
+        if self.is_on_ladder and not is_on_ground:
+            # Have we moved far enough to change the texture?
+            if abs(self.y_odometer) > game.DISTANCE_TO_CHANGE_TEXTURE:
+
+                # Reset the odometer
+                self.y_odometer = 0
+
+                # Advance the walking animation
+                self.cur_texture += 1
+
+            if self.cur_texture > 1:
+                self.cur_texture = 0
+            self.texture = self.climbing_textures[self.cur_texture]
+            return
+
+        # Jumping animation
+        if not is_on_ground:
+            if dy > game.DEAD_ZONE:
+                self.texture = self.jump_texture_pair[self.character_face_direction]
+                return
+            elif dy < -game.DEAD_ZONE:
+                self.texture = self.fall_texture_pair[self.character_face_direction]
+                return
+
+        # Idle animation
+        if abs(dx) <= game.DEAD_ZONE:
+            self.texture = self.idle_texture_pair[self.character_face_direction]
+            return
+
+        # Have we moved far enough to change the texture?
+        if abs(self.x_odometer) > game.DISTANCE_TO_CHANGE_TEXTURE:
+
+            # Reset the odometer
+            self.x_odometer = 0
+
+            # Advance the walking animation
+            self.cur_texture += 1
+            if self.cur_texture > 7:
+                self.cur_texture = 0
+            self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+
+class Enemy(Entity):
+    """Enemy Sprite class."""
+    def __init__(self):
+        super().__init__("zombie", "zombie")
+        
+        # Enemy-specific initialization
+        # Load enemy textures here, similar to Player but with enemy-specific images
+
+    def update_texture(self):
+        # Enemy-specific texture update logic
+        pass
+
+    def ai_behavior(self):
+        # Implement enemy AI logic here
+        pass

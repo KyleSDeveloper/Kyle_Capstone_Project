@@ -1,48 +1,167 @@
 import arcade
 import math
 import constants as game
-from main import PlayerSprite
-from main import EnemySprite
-from main import BulletSprite
+from entities import Player
 from typing import Optional
 
 class TitleView(arcade.View):
-    """Class that manages the 'menu' view."""
+    """Displays a title screen and prompts the user to begin the game.
+    Provides a way to show instructions and start the game.
+    """
+    def __init__(self) -> None:
+        super().__init__()
 
-    def on_show_view(self):
-        """Called when switching to this view."""
-        arcade.set_background_color(arcade.color.WHITE)
+        # Find the title image in the images folder
+        title_image_path = "assets/images/title_image.png"
+        # Load our title image
+        self.title_image = arcade.load_texture(title_image_path)
+        # Set our display timer
+        self.display_timer = 3.0
+        # Are we showing the instructions?
+        self.show_instructions = False
 
-    def on_draw(self):
-        """Draw the menu"""
-        self.clear()
-        arcade.draw_text(
-            "Main Menu - Click to play",
-            game.SCREEN_WIDTH / 2,
-            game.SCREEN_HEIGHT / 2,
-            arcade.color.BLACK,
-            font_size=30,
-            anchor_x="center",
+    def on_draw(self) -> None:
+    # Start the rendering loop
+        arcade.start_render()
+
+        # Draw a rectangle filled with our title image
+        arcade.draw_texture_rectangle(
+            center_x=game.SCREEN_WIDTH / 2,
+            center_y=game.SCREEN_HEIGHT / 2,
+            width=game.SCREEN_WIDTH,
+            height=game.SCREEN_HEIGHT,
+            texture=self.title_image,
         )
 
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
-        game_view = GameWindow()
-        self.window.show_view(game_view)
+        # Should we show our instructions?
+        if self.show_instructions:
+            arcade.draw_text(
+                "Enter to Start | I for Instructions",
+                start_x=100,
+                start_y=220,
+                color=arcade.color.INDIGO,
+                font_size=40,
+            )
+        
+    def on_key_press(self, key: int, modifiers: int) -> None:
+        """Resume the game when the user presses ESC again
 
-class GameWindow(arcade.Window):
+        Arguments:
+            key -- Which key was pressed
+            modifiers -- What modifiers were active
+        """
+        if key == arcade.key.RETURN:
+            game_view = GameView()
+            game_view.setup()
+            self.window.show_view(game_view)
+        elif key == arcade.key.I:
+            instructions_view = InstructionsView()
+            self.window.show_view(instructions_view)
+
+class InstructionsView(arcade.View):
+    """Show instructions to the player"""
+
+    def __init__(self) -> None:
+        """Create instructions screen"""
+        super().__init__()
+
+        instructions_image_path = "assets/images/instructions_image.png"
+
+        # Load our title image
+        self.instructions_image = arcade.load_texture(instructions_image_path)
+
+    def on_draw(self) -> None:
+        # Start the rendering loop
+        arcade.start_render()
+
+        # Draw a rectangle filled with the instructions image
+        arcade.draw_texture_rectangle(
+            center_x=game.SCREEN_WIDTH / 2,
+            center_y=game.SCREEN_HEIGHT / 2,
+            width=game.SCREEN_WIDTH,
+            height=game.SCREEN_HEIGHT,
+            texture=self.instructions_image,
+        )
+
+    def on_key_press(self, key: int, modifiers: int) -> None:
+        """Start the game when the user presses Enter
+
+        Arguments:
+            key -- Which key was pressed
+            modifiers -- What modifiers were active
+        """
+        if key == arcade.key.RETURN:
+            game_view = GameView()
+            game_view.setup()
+            self.window.show_view(game_view)
+
+        elif key == arcade.key.ESCAPE:
+            title_view = TitleView()
+            self.window.show_view(title_view)
+
+# Pause view, used when the player pauses the game
+class PauseView(arcade.View):
+    """Shown when the game is paused"""
+
+    def __init__(self, game_view: arcade.View) -> None:
+        """Create the pause screen"""
+        # Initialize the parent
+        super().__init__()
+
+        # Store a reference to the underlying view
+        self.game_view = game_view
+
+        # Store a semi-transparent color to use as an overlay
+        self.fill_color = arcade.make_transparent_color(
+            arcade.color.WHITE, transparency=150
+        )
+
+    def on_draw(self) -> None:
+        """Draw the underlying screen, blurred, then the Paused text"""
+
+        self.game_view.on_draw()
+
+        arcade.draw_lrtb_rectangle_filled(
+            left=self.game_view.view_left,
+            right=self.game_view.view_left + game.SCREEN_WIDTH,
+            top=self.game_view.view_bottom + game.SCREEN_HEIGHT,
+            bottom=self.game_view.view_bottom,
+            color=self.fill_color,
+        )
+
+        # Now show the Pause text
+        arcade.draw_text(
+            "PAUSED - ESC TO CONTINUE",
+            start_x=self.game_view.view_left + 180,
+            start_y=self.game_view.view_bottom + 300,
+            color=arcade.color.INDIGO,
+            font_size=40,
+        )
+
+    def on_key_press(self, key: int, modifiers: int) -> None:
+        """Resume the game when the user presses ESC again
+
+        Arguments:
+            key -- Which key was pressed
+            modifiers -- What modifiers were active
+        """
+        if key == arcade.key.ESCAPE:
+            self.window.show_view(self.game_view)
+
+class GameView(arcade.View):
     """ Main Window """
-
-    def __init__(self, width, height, title):
-        """ Create the variables """
-        # Init the parent class
-        super().__init__(width, height, title)
+    def __init__(self):
+        super().__init__()
+        self.display_timer = 0
+        self.view_left = 0
+        self.view_bottom = 0
+        self.level = 1
         
         # Player sprite
-        self.player_sprite: Optional[PlayerSprite] = None
+        self.player_sprite: Optional[Player] = None
         self.camera = None
-
-        # Sprite lists we need
+        
+        # Sprite lists
         self.player_list: Optional[arcade.SpriteList] = None
         self.wall_list: Optional[arcade.SpriteList] = None
         self.bullet_list: Optional[arcade.SpriteList] = None
@@ -50,6 +169,7 @@ class GameWindow(arcade.Window):
         self.moving_sprites_list: Optional[arcade.SpriteList] = None
         self.ladder_list: Optional[arcade.SpriteList] = None
         self.enemy_list = arcade.SpriteList()
+        self.goal_list: Optional[arcade.SpriteList] = None
 
         # Track the current state of what key is pressed
         self.left_pressed: bool = False
@@ -65,28 +185,19 @@ class GameWindow(arcade.Window):
 
     def setup(self):
         """ Set up everything with the game """
-                # Set up the Camera
-        self.camera = arcade.Camera(self.width, self.height)
-
-        # Add enemies
-        enemy = EnemySprite("assets/images/Platformer Pack Redux (360 assets) (1)/PNG/Enemies/fly.png", 
-                            "assets/images/Platformer Pack Redux (360 assets) (1)/PNG/Enemies/fly_move.png", 
-                            scale=0.5)
-        enemy.center_x = 300
-        enemy.center_y = 250
-        enemy.boundary_left = 100
-        enemy.boundary_right = 500
-        self.enemy_list.append(enemy)
+        # Set up the Camera
+        self.camera = arcade.Camera(self.window.width, self.window.height)
 
         # Create the sprite lists
         self.player_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
 
         # Map name
-        map_name = "assets/images/level_01.json"
-
+        map_name = f"level_{self.level}.json"
+        map_path = game.ASSETS_PATH / "maps" / map_name
+        
         # Load in TileMap
-        tile_map = arcade.load_tilemap(map_name, game.SPRITE_SCALING_TILES)
+        tile_map = arcade.load_tilemap(map_path, game.SPRITE_SCALING_TILES)
 
         # Pull the sprite layers out of the tile map
         self.wall_list = tile_map.sprite_lists["Platforms"]
@@ -97,7 +208,7 @@ class GameWindow(arcade.Window):
         self.goal_list = tile_map.sprite_lists["Goal"]
 
         # Create player sprite
-        self.player_sprite = PlayerSprite(self.ladder_list, hit_box_algorithm="Detailed")
+        self.player_sprite = Player(self.ladder_list, hit_box_algorithm="Simple")
 
         # Set player location
         grid_x = 1
@@ -107,7 +218,6 @@ class GameWindow(arcade.Window):
         # Add to player sprite list
         self.player_list.append(self.player_sprite)
 
-    
         damping = game.DEFAULT_DAMPING
 
         # Set the gravity. (0, 0) is good for outer space and top-down.
@@ -124,7 +234,7 @@ class GameWindow(arcade.Window):
         self.physics_engine.add_collision_handler("bullet", "wall", post_handler=wall_hit_handler)
 
         def item_hit_handler(bullet_sprite, item_sprite, _arbiter, _space, _data):
-            """ Called for bullet/wall collision """
+            """ Called for bullet/item collision """
             bullet_sprite.remove_from_sprite_lists()
             item_sprite.remove_from_sprite_lists()
 
@@ -154,6 +264,7 @@ class GameWindow(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
+    
         if key == arcade.key.LEFT:
             self.left_pressed = True
         elif key == arcade.key.RIGHT:
@@ -164,6 +275,11 @@ class GameWindow(arcade.Window):
                 impulse = (0, game.PLAYER_JUMP_IMPULSE)
                 self.physics_engine.apply_impulse(self.player_sprite, impulse)
                 self.player_sprite.jump_count += 1  # Increment jump count
+        # Did the user want to pause?
+        elif key == arcade.key.ESCAPE:
+            # Pass the current view to preserve this view's state
+            pause = PauseView(self)
+            self.window.show_view(pause)
         elif key == arcade.key.UP:
             self.up_pressed = True
         elif key == arcade.key.DOWN:
@@ -193,20 +309,15 @@ class GameWindow(arcade.Window):
         start_y = self.player_sprite.center_y
         bullet.position = self.player_sprite.position
 
-        
         dest_x = x
         dest_y = y
-
 
         x_diff = dest_x - start_x
         y_diff = dest_y - start_y
         angle = math.atan2(y_diff, x_diff)
 
-        # What is the 1/2 size of this sprite, so we can figure out how far
-        # away to spawn the bullet
         size = max(self.player_sprite.width, self.player_sprite.height) / 2
 
-        # Use angle to to spawn bullet away from player in proper direction
         bullet.center_x += size * math.cos(angle)
         bullet.center_y += size * math.sin(angle)
 
@@ -215,7 +326,6 @@ class GameWindow(arcade.Window):
 
         bullet_gravity = (0, -game.BULLET_GRAVITY)
 
-        # Add the sprite. This needs to be done AFTER setting the fields above.
         self.physics_engine.add_sprite(bullet,
                                        mass=game.BULLET_MASS,
                                        damping=1.0,
@@ -228,15 +338,12 @@ class GameWindow(arcade.Window):
         force = (game.BULLET_MOVE_FORCE, 0)
         self.physics_engine.apply_force(bullet, force)
 
-    
-
     def center_camera_to_player(self):
 
         screen_center_x = self.player_sprite.center_x - (self.camera.viewport_width / 2)
         screen_center_y = self.player_sprite.center_y - (
         self.camera.viewport_height / 2
         )
-
 
         if screen_center_x < 0:
            screen_center_x = 0
@@ -246,9 +353,13 @@ class GameWindow(arcade.Window):
 
         self.camera.move_to(player_centered)
 
-
     def on_update(self, delta_time):
         """Movement and game logic"""
+        if self.display_timer < 0:
+
+            self.show_instructions = not self.show_instructions
+
+            self.display_timer = 1.0
 
         is_on_ground = self.physics_engine.is_on_ground(self.player_sprite)
         if is_on_ground:
@@ -256,7 +367,7 @@ class GameWindow(arcade.Window):
 
         # Update player forces based on keys pressed
         if self.left_pressed and not self.right_pressed:
-            # Create a force to the left. Apply it.
+    
             if is_on_ground or self.player_sprite.is_on_ladder:
                 force = (-game.PLAYER_MOVE_FORCE_ON_GROUND, 0)
             else:
@@ -317,6 +428,11 @@ class GameWindow(arcade.Window):
 
         self.center_camera_to_player()
 
+        # Check if player reached the goal
+        if arcade.check_for_collision_with_list(self.player_sprite, self.goal_list):
+            self.level += 1
+            self.setup()
+
     def on_draw(self):
         """ Draw everything """
         self.background_list.draw()
@@ -330,4 +446,3 @@ class GameWindow(arcade.Window):
         self.goal_list.draw()
         self.player_list.draw()
         self.enemy_list.draw()
-

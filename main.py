@@ -3,7 +3,7 @@ import arcade
 import constants as game
 
 def main():
-    from new_views import TitleView
+    from views import TitleView
     """ Main function """
     window = arcade.Window(game.SCREEN_WIDTH, game.SCREEN_HEIGHT, game.SCREEN_TITLE)
     title_view = TitleView()

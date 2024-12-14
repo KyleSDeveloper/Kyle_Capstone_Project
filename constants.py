@@ -75,7 +75,7 @@ SCREEN_WIDTH = SPRITE_SIZE * SCREEN_GRID_WIDTH
 SCREEN_HEIGHT = SPRITE_SIZE * SCREEN_GRID_HEIGHT
 
 # Screen title
-SCREEN_TITLE = "PyMunk Platformer"
+SCREEN_TITLE = "RoboWars"
 
 # Friction between objects
 WALL_FRICTION = 0.7

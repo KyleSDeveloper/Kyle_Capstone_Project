@@ -264,44 +264,42 @@ class GameView(arcade.View):
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
-    
-        if key == arcade.key.LEFT:
+        if key == arcade.key.A:
             self.left_pressed = True
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.D:
             self.right_pressed = True
+        elif key == arcade.key.W:
+            self.up_pressed = True
+        elif key == arcade.key.S:
+            self.down_pressed = True
         elif key == arcade.key.SPACE:
             # Check if the player can jump
             if self.physics_engine.is_on_ground(self.player_sprite) or self.player_sprite.jump_count < 1:
                 impulse = (0, game.PLAYER_JUMP_IMPULSE)
                 self.physics_engine.apply_impulse(self.player_sprite, impulse)
                 self.player_sprite.jump_count += 1  # Increment jump count
-        # Did the user want to pause?
         elif key == arcade.key.ESCAPE:
             # Pass the current view to preserve this view's state
             pause = PauseView(self)
             self.window.show_view(pause)
-        elif key == arcade.key.UP:
-            self.up_pressed = True
-        elif key == arcade.key.DOWN:
-            self.down_pressed = True
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
-        if key == arcade.key.LEFT:
+        if key == arcade.key.A:
             self.left_pressed = False
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.D:
             self.right_pressed = False
+        elif key == arcade.key.W:
+            self.up_pressed = False
+        elif key == arcade.key.S:
+            self.down_pressed = False
         elif key == arcade.key.SPACE:
             self.space_pressed = False
-        elif key == arcade.key.UP:
-            self.up_pressed = False
-        elif key == arcade.key.DOWN:
-            self.down_pressed = False
 
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called whenever the mouse button is clicked. """
 
-        bullet = BulletSprite(20, 5, arcade.color.DARK_YELLOW)
+        bullet = arcade.SpriteSolidColor(20, 5, arcade.color.DARK_RED)
         self.bullet_list.append(bullet)
 
         # Position the bullet at the player's current location
@@ -315,9 +313,9 @@ class GameView(arcade.View):
         x_diff = dest_x - start_x
         y_diff = dest_y - start_y
         angle = math.atan2(y_diff, x_diff)
-
         size = max(self.player_sprite.width, self.player_sprite.height) / 2
 
+        # Use angle to spawn bullet away from player in proper direction
         bullet.center_x += size * math.cos(angle)
         bullet.center_y += size * math.sin(angle)
 
@@ -326,6 +324,7 @@ class GameView(arcade.View):
 
         bullet_gravity = (0, -game.BULLET_GRAVITY)
 
+        # Add the sprite. This needs to be done AFTER setting the fields above.
         self.physics_engine.add_sprite(bullet,
                                        mass=game.BULLET_MASS,
                                        damping=1.0,
@@ -334,9 +333,10 @@ class GameView(arcade.View):
                                        gravity=bullet_gravity,
                                        elasticity=0.9)
 
-        # Add force to bullet
-        force = (game.BULLET_MOVE_FORCE, 0)
-        self.physics_engine.apply_force(bullet, force)
+        # Set velocity of bullet
+        speed = 5000  # Adjust this value to change the speed of the bullet
+        velocity = (speed * math.cos(angle), speed * math.sin(angle))
+        self.physics_engine.set_velocity(bullet, velocity)
 
     def center_camera_to_player(self):
 

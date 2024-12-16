@@ -157,7 +157,9 @@ class GameView(arcade.View):
         self.view_bottom = 0
         self.level = 1
         
-        # Player sprite
+        
+        
+         # Player sprite
         self.player_sprite: Optional[Player] = None
         self.camera = None
         
@@ -168,7 +170,7 @@ class GameView(arcade.View):
         self.item_list: Optional[arcade.SpriteList] = None
         self.moving_sprites_list: Optional[arcade.SpriteList] = None
         self.ladder_list: Optional[arcade.SpriteList] = None
-        self.enemy_list = arcade.SpriteList()
+        self.enemy_list: Optional[arcade.SpriteList] = None
         self.goal_list: Optional[arcade.SpriteList] = None
 
         # Track the current state of what key is pressed
@@ -182,6 +184,15 @@ class GameView(arcade.View):
 
         # Set background color
         arcade.set_background_color(arcade.color.SILVER_LAKE_BLUE)
+        self.end_of_map = 0
+
+        # Keep track of the score
+        self.score = 0
+
+        # Load sounds
+        self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
+        self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
+        self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
 
     def setup(self):
         """ Set up everything with the game """
@@ -191,6 +202,7 @@ class GameView(arcade.View):
         # Create the sprite lists
         self.player_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
+        self.enemy_list = arcade.SpriteList()
 
         # Map name
         map_name = f"level_{self.level}.json"
@@ -209,6 +221,12 @@ class GameView(arcade.View):
 
         # Create player sprite
         self.player_sprite = Player(self.ladder_list, hit_box_algorithm="Simple")
+
+        # Create enemy sprite
+        from newentities import Enemy
+        self.enemy_sprite = Enemy("robot", "robot")
+        # Add to enemy sprite list
+        self.enemy_list.append(self.enemy_sprite)
 
         # Set player location
         grid_x = 1
@@ -261,6 +279,10 @@ class GameView(arcade.View):
         # Add kinematic sprites
         self.physics_engine.add_sprite_list(self.moving_sprites_list,
                                             body_type=arcade.PymunkPhysicsEngine.KINEMATIC)
+        
+        # Add the enemies to the physics engine
+        for enemy in self.enemy_list:
+            self.physics_engine.add_sprite(enemy, friction=0.6, mass=2.0, moment=arcade.PymunkPhysicsEngine.MOMENT_INF)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -446,3 +468,4 @@ class GameView(arcade.View):
         self.goal_list.draw()
         self.player_list.draw()
         self.enemy_list.draw()
+    

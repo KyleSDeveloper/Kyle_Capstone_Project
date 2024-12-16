@@ -11,7 +11,6 @@ class TitleView(arcade.View):
     def __init__(self) -> None:
         super().__init__()
 
-        # Find the title image in the images folder
         title_image_path = "assets/images/title_image.png"
         # Load our title image
         self.title_image = arcade.load_texture(title_image_path)

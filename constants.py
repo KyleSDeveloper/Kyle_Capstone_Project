@@ -1,7 +1,7 @@
 import pathlib
 
 # Assets path
-ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "Kyle_Capstone_Project-1" / "assets"
+ASSETS_PATH = pathlib.Path(__file__).resolve().parent.parent / "Kyle_Capstone_Project" / "assets"
 
 # How much force to put on the bullet
 BULLET_MOVE_FORCE = 4500

@@ -330,15 +330,15 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"spritesheet_ground.tsx"
+         "source":"../maps/spritesheet_ground.tsx"
         }, 
         {
          "firstgid":129,
-         "source":"spritesheet_tiles.tsx"
+         "source":"../maps/spritesheet_tiles.tsx"
         }, 
         {
          "firstgid":257,
-         "source":"spritesheet_items.tsx"
+         "source":"../maps/spritesheet_items.tsx"
         }],
  "tilewidth":128,
  "type":"map",

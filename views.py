@@ -157,9 +157,7 @@ class GameView(arcade.View):
         self.view_bottom = 0
         self.level = 1
         
-        
-        
-         # Player sprite
+        # Player sprite
         self.player_sprite: Optional[Player] = None
         self.camera = None
         

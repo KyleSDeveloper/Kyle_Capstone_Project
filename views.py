@@ -14,8 +14,7 @@ class TitleView(arcade.View):
         title_image_path = "assets/images/title_image.png"
         # Load our title image
         self.title_image = arcade.load_texture(title_image_path)
-        # Set our display timer
-        self.display_timer = 3.0
+
         # Are we showing the instructions?
         self.show_instructions = False
 
@@ -31,16 +30,6 @@ class TitleView(arcade.View):
             height=game.SCREEN_HEIGHT,
             texture=self.title_image,
         )
-
-        # Should we show our instructions?
-        if self.show_instructions:
-            arcade.draw_text(
-                "Enter to Start | I for Instructions",
-                start_x=100,
-                start_y=220,
-                color=arcade.color.INDIGO,
-                font_size=40,
-            )
         
     def on_key_press(self, key: int, modifiers: int) -> None:
         """Resume the game when the user presses ESC again

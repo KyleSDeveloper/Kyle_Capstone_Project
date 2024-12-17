@@ -89,41 +89,33 @@ class InstructionsView(arcade.View):
 
 # Pause view, used when the player pauses the game
 class PauseView(arcade.View):
-    """Shown when the game is paused"""
-
-    def __init__(self, game_view: arcade.View) -> None:
-        """Create the pause screen"""
-        # Initialize the parent
+    def __init__(self, game_view):
         super().__init__()
-
-        # Store a reference to the underlying view
         self.game_view = game_view
-
-        # Store a semi-transparent color to use as an overlay
-        self.fill_color = arcade.make_transparent_color(
-            arcade.color.WHITE, transparency=150
-        )
+        self.fill_color = (0, 0, 0, 150)  # Semi-transparent black
 
     def on_draw(self) -> None:
         """Draw the underlying screen, blurred, then the Paused text"""
 
+        # Use the game view's camera to draw the game elements
+        self.game_view.camera.use()
+
+        # Draw the game view
         self.game_view.on_draw()
 
-        arcade.draw_lrtb_rectangle_filled(
-            left=self.game_view.view_left,
-            right=self.game_view.view_left + game.SCREEN_WIDTH,
-            top=self.game_view.view_bottom + game.SCREEN_HEIGHT,
-            bottom=self.game_view.view_bottom,
-            color=self.fill_color,
-        )
+        # Get the player's position
+        player_x = self.game_view.player_sprite.center_x
+        player_y = self.game_view.player_sprite.center_y
 
-        # Now show the Pause text
+        # Now show the Pause text centered relative to the player's position
         arcade.draw_text(
             "PAUSED - ESC TO CONTINUE",
-            start_x=self.game_view.view_left + 180,
-            start_y=self.game_view.view_bottom + 300,
+            start_x=player_x,
+            start_y=player_y,
             color=arcade.color.INDIGO,
             font_size=40,
+            anchor_x="center",
+            anchor_y="center"
         )
 
     def on_key_press(self, key: int, modifiers: int) -> None:
@@ -454,4 +446,3 @@ class GameView(arcade.View):
         self.goal_list.draw()
         self.player_list.draw()
         self.enemy_list.draw()
-    

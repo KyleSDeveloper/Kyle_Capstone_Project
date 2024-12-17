@@ -64,7 +64,7 @@ class InstructionsView(arcade.View):
         """Create instructions screen"""
         super().__init__()
 
-        instructions_image_path = "assets/images/instructions_image.png"
+        instructions_image_path = ""
 
         # Load our title image
         self.instructions_image = arcade.load_texture(instructions_image_path)

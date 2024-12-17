@@ -57,12 +57,22 @@
                         {
                          "name":"boundary_bottom",
                          "type":"float",
-                         "value":300
+                         "value":200
                         }, 
                         {
                          "name":"boundary_top",
                          "type":"float",
                          "value":800
+                        }, 
+                        {
+                         "name":"change_x",
+                         "type":"float",
+                         "value":0
+                        }, 
+                        {
+                         "name":"change_y",
+                         "type":"float",
+                         "value":2
                         }],
                  "rotation":0,
                  "type":"",

@@ -55,9 +55,19 @@
                  "name":"",
                  "properties":[
                         {
+                         "name":"boundary_down",
+                         "type":"float",
+                         "value":100
+                        }, 
+                        {
                          "name":"boundary_up",
                          "type":"float",
-                         "value":0
+                         "value":800
+                        }, 
+                        {
+                         "name":"change_y",
+                         "type":"float",
+                         "value":2
                         }],
                  "rotation":0,
                  "type":"",

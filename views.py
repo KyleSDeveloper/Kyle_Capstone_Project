@@ -1,7 +1,7 @@
 import arcade
 import math
 import constants as game
-from entities import Player
+from entities import Player, RobotEnemy
 from typing import Optional
 
 class TitleView(arcade.View):
@@ -176,6 +176,7 @@ class GameView(arcade.View):
         """ Set up everything with the game """
          # Initialize the camera
         self.camera = arcade.Camera(game.SCREEN_WIDTH, game.SCREEN_HEIGHT)
+        
 
         # Create the sprite lists
         self.player_list = arcade.SpriteList()
@@ -199,12 +200,35 @@ class GameView(arcade.View):
 
         # Create player sprite
         self.player_sprite = Player(self.ladder_list, hit_box_algorithm="Simple")
+        
+        # Load the "Enemies" object layer
+        enemies_layer = tile_map.object_lists["Enemies"]
+        
+        
 
-        # Create enemy sprite
-        from newentities import Enemy
-        self.enemy_sprite = Enemy("robot", "robot")
-        # Add to enemy sprite list
-        self.enemy_list.append(self.enemy_sprite)
+        for my_object in enemies_layer:
+            cartesian = tile_map.get_cartesian(
+                my_object.shape[0], my_object.shape[1]
+            )
+            enemy_type = my_object.properties["type"]
+            if enemy_type == "robot":
+                enemy = RobotEnemy()
+            enemy.center_x = math.floor(
+                cartesian[0] * game.SPRITE_SCALING_TILES * tile_map.tile_width
+            )
+            enemy.center_y = math.floor(
+                (cartesian[1] + 1) * (tile_map.tile_height * game.SPRITE_SCALING_TILES)
+            )
+            if "boundary_left" in my_object.properties:
+                enemy.boundary_left = my_object.properties["boundary_left"]
+            if "boundary_right" in my_object.properties:
+                enemy.boundary_right = my_object.properties["boundary_right"]
+            if "change_x" in my_object.properties:
+                enemy.change_x = my_object.properties["change_x"]
+            self.enemy_list.append(enemy)
+
+           
+    
 
         # Set player location
         grid_x = 1
@@ -428,6 +452,7 @@ class GameView(arcade.View):
             self.physics_engine.set_velocity(moving_sprite, velocity)
 
         self.center_camera_to_player()
+        self.enemy_list.update()
 
         # Check if player reached the goal
         if arcade.check_for_collision_with_list(self.player_sprite, self.goal_list):
@@ -436,6 +461,7 @@ class GameView(arcade.View):
 
     def on_draw(self):
         """ Draw everything """
+    
         self.background_list.draw()
         self.camera.use()
         self.clear()

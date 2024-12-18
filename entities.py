@@ -154,12 +154,13 @@ class Player(Entity):
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
 class Enemy(Entity):
-    def __init__(self):
+    def __init__(self, name_folder, name_file):
 
         # Setup parent class
-        super().__init__("robot", "robot")
+        super().__init__(name_folder, name_file)
 
         self.should_update_walk = 0
+        self.health = 0
 
     def update_animation(self, delta_time: float = 1 / 60):
 
@@ -185,7 +186,14 @@ class Enemy(Entity):
 
         self.should_update_walk += 1
 
-    def ai_behavior(self):
-        # Implement enemy AI logic here
-        pass
+
+class RobotEnemy(Enemy):
+    def __init__(self):
+
+        # Set up parent class
+        super().__init__("robot", "robot")
+
+        self.health = 100
+
+    
 

@@ -139,7 +139,7 @@ class GameView(arcade.View):
         
         # Player sprite
         self.player_sprite: Optional[Player] = None
-        self.camera = None
+        
         
         # Sprite lists
         self.player_list: Optional[arcade.SpriteList] = None
@@ -174,8 +174,8 @@ class GameView(arcade.View):
 
     def setup(self):
         """ Set up everything with the game """
-        # Set up the Camera
-        self.camera = arcade.Camera(self.window.width, self.window.height)
+         # Initialize the camera
+        self.camera = arcade.Camera(game.SCREEN_WIDTH, game.SCREEN_HEIGHT)
 
         # Create the sprite lists
         self.player_list = arcade.SpriteList()
@@ -278,6 +278,7 @@ class GameView(arcade.View):
                 impulse = (0, game.PLAYER_JUMP_IMPULSE)
                 self.physics_engine.apply_impulse(self.player_sprite, impulse)
                 self.player_sprite.jump_count += 1  # Increment jump count
+                arcade.play_sound(self.jump_sound)
         elif key == arcade.key.ESCAPE:
             # Pass the current view to preserve this view's state
             pause = PauseView(self)

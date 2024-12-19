@@ -1,7 +1,7 @@
 import arcade
 import math
 import constants as game
-from entities import Player, RobotEnemy
+from newentities import Player, RobotEnemy
 from typing import Optional
 
 class TitleView(arcade.View):
@@ -332,8 +332,8 @@ class GameView(arcade.View):
         start_y = self.player_sprite.center_y
         bullet.position = self.player_sprite.position
 
-        dest_x = x
-        dest_y = y
+        dest_x = x + self.camera.position[0]
+        dest_y = y + self.camera.position[1]
 
         x_diff = dest_x - start_x
         y_diff = dest_y - start_y
@@ -341,8 +341,8 @@ class GameView(arcade.View):
         size = max(self.player_sprite.width, self.player_sprite.height) / 2
 
         # Use angle to spawn bullet away from player in proper direction
-        bullet.center_x += size * math.cos(angle)
-        bullet.center_y += size * math.sin(angle)
+        bullet.center_x = start_x
+        bullet.center_y = start_y
 
         # Set angle of bullet
         bullet.angle = math.degrees(angle)
@@ -452,7 +452,8 @@ class GameView(arcade.View):
             self.physics_engine.set_velocity(moving_sprite, velocity)
 
         self.center_camera_to_player()
-        self.enemy_list.update()
+        for enemy in self.enemy_list:
+            enemy.update(delta_time, self.player_sprite)
 
         # Check if player reached the goal
         if arcade.check_for_collision_with_list(self.player_sprite, self.goal_list):

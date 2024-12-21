@@ -81,9 +81,7 @@ SPRITE_SCALING_LASER = 0.8
 # Friction between objects
 WALL_FRICTION = 0.7
 
-# Enemy move speed
-ENEMY_MOVE_SPEED = 2
 
-# Distance to change enemy texture
-ENEMY_TEXTURE_CHANGE_DISTANCE = 20
+
+
 

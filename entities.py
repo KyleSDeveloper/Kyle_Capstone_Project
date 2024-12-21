@@ -44,16 +44,14 @@ class Entity(arcade.Sprite):
 
     def pymunk_moved(self, physics_engine, dx, dy, d_angle):
         """ Handle being moved by the pymunk engine """
-        # Figure out if we need to face left or right
         if dx < -game.DEAD_ZONE and self.character_face_direction == game.RIGHT_FACING:
             self.character_face_direction = game.LEFT_FACING
         elif dx > game.DEAD_ZONE and self.character_face_direction == game.LEFT_FACING:
             self.character_face_direction = game.RIGHT_FACING
 
-        # Are we on the ground?
+    
         is_on_ground = physics_engine.is_on_ground(self)
 
-        # Are we on a ladder?
         if self.ladder_list and len(arcade.check_for_collision_with_list(self, self.ladder_list)) > 0:
             if not self.is_on_ladder:
                 self.is_on_ladder = True
@@ -67,7 +65,7 @@ class Entity(arcade.Sprite):
                 self.is_on_ladder = False
                 self.pymunk.gravity = None
 
-        # Add to the odometer how far we've moved
+        #  odometer for how far we've moved
         self.x_odometer += dx
         self.y_odometer += dy
 
@@ -115,10 +113,7 @@ class Player(Entity):
     """Player Sprite class."""
     def __init__(self, ladder_list: arcade.SpriteList, hit_box_algorithm):
         super().__init__("male_person", "malePerson", ladder_list, hit_box_algorithm)
-
-         # Health attribute
-        self.health = 100
-        # Set our hit box
+        
 
 
 class Enemy(Entity):
@@ -166,15 +161,7 @@ class Enemy(Entity):
         if self.boundary_right is not None and self.center_x > self.boundary_right:
             self.change_x *= -1
 
-        # Attack the player if in range
-        if distance < self.attack_range and self.time_since_last_attack >= self.attack_cooldown:
-            player_sprite.health -= 10  # Example damage value
-            self.time_since_last_attack = 0
-
-        # Update the time since the last attack
-        self.time_since_last_attack += delta_time
-
-                # Check for collisions with projectiles
+        # Check for collisions with projectiles
         for bullet in bullet_list:
             if arcade.check_for_collision(self, bullet):
                 self.take_damage(self.default_damage)  # Use default damage value

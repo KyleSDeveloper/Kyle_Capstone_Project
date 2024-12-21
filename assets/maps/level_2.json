@@ -74,6 +74,50 @@
         }, 
         {
          "draworder":"topdown",
+         "id":10,
+         "name":"Enemies",
+         "objects":[
+                {
+                 "height":0,
+                 "id":7,
+                 "name":"",
+                 "point":true,
+                 "properties":[
+                        {
+                         "name":"boundary_left",
+                         "type":"int",
+                         "value":704
+                        }, 
+                        {
+                         "name":"boundary_right",
+                         "type":"int",
+                         "value":896
+                        }, 
+                        {
+                         "name":"change_x",
+                         "type":"int",
+                         "value":1
+                        }, 
+                        {
+                         "name":"type",
+                         "type":"string",
+                         "value":"robot"
+                        }],
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1352,
+                 "y":1976
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":3,
          "name":"coins",
          "objects":[],
@@ -247,8 +291,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":7,
+ "nextlayerid":11,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

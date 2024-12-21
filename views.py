@@ -1,7 +1,7 @@
 import arcade
 import math
 import constants as game
-from newentities import Player, RobotEnemy
+from entities import Player, RobotEnemy
 from typing import Optional
 
 class TitleView(arcade.View):
@@ -127,6 +127,52 @@ class PauseView(arcade.View):
         """
         if key == arcade.key.ESCAPE:
             self.window.show_view(self.game_view)
+
+class GameOverView(arcade.View):
+    def __init__(self, game_view):
+        super().__init__()
+        self.game_view = game_view
+        self.fill_color = (0, 0, 0, 150)  # Semi-transparent black
+
+    def on_draw(self) -> None:
+        """Draw the underlying screen, blurred, then the Game Over text"""
+
+        # Use the game view's camera to draw the game elements
+        self.game_view.camera.use()
+
+        # Draw the game view
+        self.game_view.on_draw()
+
+        # Get the player's position
+        player_x = self.game_view.player_sprite.center_x
+        player_y = self.game_view.player_sprite.center_y
+
+        # Now show the Game Over text centered relative to the player's position
+        arcade.draw_text(
+            "GAME OVER",
+            start_x=player_x,
+            start_y=player_y + 50,  # Adjust the y position if needed
+            color=arcade.color.RED,
+            font_size=50,
+            anchor_x="center",
+            anchor_y="center"
+        )
+
+        arcade.draw_text(
+            "Press ENTER to Restart",
+            start_x=player_x,
+            start_y=player_y - 50,  # Adjust the y position if needed
+            color=arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+            anchor_y="center"
+        )
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            game_view = GameView()
+            game_view.setup()
+            self.window.show_view(game_view)
 
 class GameView(arcade.View):
     """ Main Window """
@@ -324,7 +370,10 @@ class GameView(arcade.View):
     def on_mouse_press(self, x, y, button, modifiers):
         """ Called whenever the mouse button is clicked. """
 
-        bullet = arcade.SpriteSolidColor(20, 5, arcade.color.DARK_RED)
+        bullet = arcade.Sprite(
+                    ":resources:images/space_shooter/laserBlue01.png",
+                    game.SPRITE_SCALING_LASER
+                )
         self.bullet_list.append(bullet)
 
         # Position the bullet at the player's current location
@@ -338,8 +387,7 @@ class GameView(arcade.View):
         x_diff = dest_x - start_x
         y_diff = dest_y - start_y
         angle = math.atan2(y_diff, x_diff)
-        size = max(self.player_sprite.width, self.player_sprite.height) / 2
-
+        
         # Use angle to spawn bullet away from player in proper direction
         bullet.center_x = start_x
         bullet.center_y = start_y
@@ -453,12 +501,19 @@ class GameView(arcade.View):
 
         self.center_camera_to_player()
         for enemy in self.enemy_list:
-            enemy.update(delta_time, self.player_sprite)
+            enemy.update(delta_time, self.player_sprite, self.physics_engine, self.bullet_list)
 
         # Check if player reached the goal
         if arcade.check_for_collision_with_list(self.player_sprite, self.goal_list):
             self.level += 1
             self.setup()
+        
+        # Check for collision with enemies
+        hit_enemies = arcade.check_for_collision_with_list(self.player_sprite, self.enemy_list)
+        if hit_enemies:
+            game_over_view = GameOverView(self)
+            self.window.show_view(game_over_view)
+
 
     def on_draw(self):
         """ Draw everything """

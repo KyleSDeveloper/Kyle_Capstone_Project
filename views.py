@@ -107,7 +107,7 @@ class PauseView(arcade.View):
         player_x = self.game_view.player_sprite.center_x
         player_y = self.game_view.player_sprite.center_y
 
-        # Now show the Pause text centered relative to the player's position
+        # show the Pause text centered relative to the player's position
         arcade.draw_text(
             "PAUSED - ESC TO CONTINUE",
             start_x=player_x,
@@ -147,11 +147,11 @@ class GameOverView(arcade.View):
         player_x = self.game_view.player_sprite.center_x
         player_y = self.game_view.player_sprite.center_y
 
-        # Now show the Game Over text centered relative to the player's position
+        # show the Game Over text centered relative to the player's position
         arcade.draw_text(
             "GAME OVER",
             start_x=player_x,
-            start_y=player_y + 50,  # Adjust the y position if needed
+            start_y=player_y + 50,  
             color=arcade.color.RED,
             font_size=50,
             anchor_x="center",
@@ -161,7 +161,7 @@ class GameOverView(arcade.View):
         arcade.draw_text(
             "Press ENTER to Restart",
             start_x=player_x,
-            start_y=player_y - 50,  # Adjust the y position if needed
+            start_y=player_y - 50,  
             color=arcade.color.WHITE,
             font_size=20,
             anchor_x="center",
@@ -199,7 +199,7 @@ class WinView(arcade.View):
         arcade.draw_text(
             "YOU WIN!",
             start_x=player_x,
-            start_y=player_y + 50,  # Adjust the y position if needed
+            start_y=player_y + 50,  
             color=arcade.color.WHITE,
             font_size=50,
             anchor_x="center",
@@ -262,7 +262,6 @@ class GameView(arcade.View):
         self.score = 0
 
         # Load sounds
-        self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
 
@@ -286,7 +285,7 @@ class GameView(arcade.View):
         # Load in TileMap
         tile_map = arcade.load_tilemap(map_path, game.SPRITE_SCALING_TILES)
 
-            # Get the map dimensions from the tile_map object
+        # Get the map dimensions from the tile_map object
         self.map_width = tile_map.width * tile_map.tile_width
         self.map_height = tile_map.height * tile_map.tile_height
 

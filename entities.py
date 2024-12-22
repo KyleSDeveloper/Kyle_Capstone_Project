@@ -197,6 +197,13 @@ class RobotEnemy(Enemy):
         self.health = 100
         self.default_damage = 10
 
+class SuperRobot(RobotEnemy):
+    def __init__(self):
+        super().__init__()
+        self.scale = 2.0  # Make the SuperRobot twice as big
+        self.health = 1000  # Increase health to make it stronger
+        self.default_damage = 30  # Increase damage to make it stronger
+
 
 
 

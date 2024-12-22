@@ -1,7 +1,7 @@
 import arcade
 import math
 import constants as game
-from entities import Player, RobotEnemy
+from entities import Player, RobotEnemy, SuperRobot
 from typing import Optional
 
 class TitleView(arcade.View):
@@ -174,6 +174,25 @@ class GameOverView(arcade.View):
             game_view.setup()
             self.window.show_view(game_view)
 
+class WinView(arcade.View):
+    def on_show(self):
+        arcade.set_background_color(arcade.color.DARK_SLATE_GRAY)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("YOU WIN!", self.window.width / 2, self.window.height / 2,
+                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        arcade.draw_text("Press ENTER to Restart", self.window.width / 2, self.window.height / 2 - 75,
+                         arcade.color.WHITE, font_size=20, anchor_x="center")
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            game_view = GameView()
+            game_view.setup()
+            self.window.show_view(game_view)
+
+
+
 class GameView(arcade.View):
     """ Main Window """
     def __init__(self):
@@ -207,7 +226,7 @@ class GameView(arcade.View):
         self.physics_engine: Optional[arcade.PymunkPhysicsEngine] = None
 
         # Set background color
-        arcade.set_background_color(arcade.color.SILVER_LAKE_BLUE)
+        arcade.set_background_color(arcade.color.CHARCOAL)
         self.end_of_map = 0
 
         # Keep track of the score
@@ -229,12 +248,18 @@ class GameView(arcade.View):
         self.bullet_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
 
+        
+
         # Map name
         map_name = f"level_{self.level}.json"
         map_path = game.ASSETS_PATH / "maps" / map_name
         
         # Load in TileMap
         tile_map = arcade.load_tilemap(map_path, game.SPRITE_SCALING_TILES)
+
+            # Get the map dimensions from the tile_map object
+        self.map_width = tile_map.width * tile_map.tile_width
+        self.map_height = tile_map.height * tile_map.tile_height
 
         # Pull the sprite layers out of the tile map
         self.wall_list = tile_map.sprite_lists["Platforms"]
@@ -259,6 +284,8 @@ class GameView(arcade.View):
             enemy_type = my_object.properties["type"]
             if enemy_type == "robot":
                 enemy = RobotEnemy()
+            elif enemy_type == "superrobot":
+                enemy = SuperRobot()
             enemy.center_x = math.floor(
                 cartesian[0] * game.SPRITE_SCALING_TILES * tile_map.tile_width
             )
@@ -418,13 +445,15 @@ class GameView(arcade.View):
         self.camera.viewport_height / 2
         )
 
-        if screen_center_x < 0:
-           screen_center_x = 0
-        if screen_center_y < 0:
-            screen_center_y = 0
-        player_centered = screen_center_x, screen_center_y
+        # Ensure the camera doesn't go beyond the map boundaries
+        screen_center_x = max(0, screen_center_x)
+        screen_center_x = min(self.map_width - self.camera.viewport_width, screen_center_x)
+        screen_center_y = max(0, screen_center_y)
+        screen_center_y = min(self.map_height - self.camera.viewport_height, screen_center_y)
 
-        self.camera.move_to(player_centered)
+        
+
+        self.camera.move_to((screen_center_x, screen_center_y))
 
     def on_update(self, delta_time):
         """Movement and game logic"""
@@ -472,11 +501,15 @@ class GameView(arcade.View):
                 # Set friction to zero for the player while moving
                 self.physics_engine.set_friction(self.player_sprite, 0)
         else:
-            # Player's feet are not moving. Therefore up the friction so we stop.
+        
             self.physics_engine.set_friction(self.player_sprite, 1.0)
 
         # Move items in the physics engine
         self.physics_engine.step()
+
+        # Clamp the player's position to the map boundaries
+        self.player_sprite.center_x = max(0, min(self.player_sprite.center_x, self.map_width))
+        self.player_sprite.center_y = max(0, min(self.player_sprite.center_y, self.map_height))
 
         for moving_sprite in self.moving_sprites_list:
             if moving_sprite.boundary_right and \
@@ -513,6 +546,8 @@ class GameView(arcade.View):
         if hit_enemies:
             game_over_view = GameOverView(self)
             self.window.show_view(game_over_view)
+            arcade.play_sound(self.game_over)
+        
 
 
     def on_draw(self):

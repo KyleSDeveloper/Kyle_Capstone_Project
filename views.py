@@ -175,23 +175,52 @@ class GameOverView(arcade.View):
             self.window.show_view(game_view)
 
 class WinView(arcade.View):
+    def __init__(self, game_view):
+        super().__init__()
+        self.game_view = game_view
+
     def on_show(self):
         arcade.set_background_color(arcade.color.DARK_SLATE_GRAY)
 
     def on_draw(self):
-        arcade.start_render()
-        arcade.draw_text("YOU WIN!", self.window.width / 2, self.window.height / 2,
-                         arcade.color.WHITE, font_size=50, anchor_x="center")
-        arcade.draw_text("Press ENTER to Restart", self.window.width / 2, self.window.height / 2 - 75,
-                         arcade.color.WHITE, font_size=20, anchor_x="center")
+        """Draw the underlying screen, blurred, then the Win text"""
+
+        # Use the game view's camera to draw the game elements
+        self.game_view.camera.use()
+
+        # Draw the game view
+        self.game_view.on_draw()
+
+        # Get the player's position
+        player_x = self.game_view.player_sprite.center_x
+        player_y = self.game_view.player_sprite.center_y
+
+        # Now show the Win text centered relative to the player's position
+        arcade.draw_text(
+            "YOU WIN!",
+            start_x=player_x,
+            start_y=player_y + 50,  # Adjust the y position if needed
+            color=arcade.color.WHITE,
+            font_size=50,
+            anchor_x="center",
+            anchor_y="center"
+        )
+
+        arcade.draw_text(
+            "Press ENTER to Restart",
+            start_x=player_x,
+            start_y=player_y - 50,  # Adjust the y position if needed
+            color=arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+            anchor_y="center"
+        )
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
             game_view = GameView()
             game_view.setup()
             self.window.show_view(game_view)
-
-
 
 class GameView(arcade.View):
     """ Main Window """
@@ -538,8 +567,12 @@ class GameView(arcade.View):
 
         # Check if player reached the goal
         if arcade.check_for_collision_with_list(self.player_sprite, self.goal_list):
-            self.level += 1
-            self.setup()
+            if self.level == 4:
+                win_view = WinView(self)
+                self.window.show_view(win_view)
+            else:
+                self.level += 1
+                self.setup()
         
         # Check for collision with enemies
         hit_enemies = arcade.check_for_collision_with_list(self.player_sprite, self.enemy_list)

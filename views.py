@@ -341,7 +341,7 @@ class GameView(arcade.View):
 
         damping = game.DEFAULT_DAMPING
 
-        # Set the gravity. (0, 0) is good for outer space and top-down.
+        # Set the gravity. 
         gravity = (0, -game.GRAVITY)
 
         # Create the physics engine

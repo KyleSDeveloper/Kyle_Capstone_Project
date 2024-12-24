@@ -32,12 +32,7 @@ class TitleView(arcade.View):
         )
         
     def on_key_press(self, key: int, modifiers: int) -> None:
-        """Resume the game when the user presses ESC again
-
-        Arguments:
-            key -- Which key was pressed
-            modifiers -- What modifiers were active
-        """
+        """Resume the game when the user presses ESC again"""
         if key == arcade.key.RETURN:
             game_view = GameView()
             game_view.setup()

@@ -259,7 +259,7 @@ class GameView(arcade.View):
         # Load sounds
         self.jump_sound = arcade.load_sound(":resources:sounds/jump1.wav")
         self.game_over = arcade.load_sound(":resources:sounds/gameover1.wav")
-
+            
     def setup(self):
         """ Set up everything with the game """
          # Initialize the camera
@@ -270,8 +270,6 @@ class GameView(arcade.View):
         self.player_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
-
-        
 
         # Map name
         map_name = f"level_{self.level}.json"

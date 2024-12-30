@@ -1,7 +1,7 @@
 import arcade
 import math
 import constants as game
-from entities_copy import Player, RobotEnemy, SuperRobot
+from entities import Player, RobotEnemy, SuperRobot
 from typing import Optional
 
 class TitleView(arcade.View):

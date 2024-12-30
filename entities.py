@@ -117,7 +117,7 @@ class Player(Entity):
 
 
 class Enemy(Entity):
-    def __init__(self, name_folder, name_file):
+    def __init__(self, name_folder, name_file, platform_list):
         super().__init__(name_folder, name_file)
         self.speed = 100  # speed (adjust as needed)
         self.chase_range = 600  # chase range
@@ -129,6 +129,7 @@ class Enemy(Entity):
         self.attack_cooldown = 1.0  
         self.time_since_last_attack = 0
         self.animation_timer = 0  # Timer to control animation speed
+        self.platform_list = platform_list
 
     def take_damage(self, damage):
         self.health -= damage
@@ -136,13 +137,29 @@ class Enemy(Entity):
             self.kill()  # Remove the enemy from the game
 
     
+    def is_ground_ahead(self):
+        """ Check if there is ground in front of the enemy """
+        direction = 1 if self.change_x > 0 else -1
+        front_x = self.center_x + (self.width / 2 * direction)
+        front_y = self.center_y - self.height / 2  
+
+        # Create a dummy sprite to check collision
+        check_sprite = arcade.Sprite()
+        check_sprite.center_x = front_x
+        check_sprite.center_y = front_y
+        check_sprite.width = 1  
+        check_sprite.height = self.height  
+
+        # Check if there's any platform under the new position
+        collisions = arcade.check_for_collision_with_list(check_sprite, self.platform_list)
+        return len(collisions) > 0
 
     def update(self, delta_time, player_sprite, physics_engine, bullet_list):
 
         # Chase the player if within range
         dx = player_sprite.center_x - self.center_x
         dy = player_sprite.center_y - self.center_y
-        distance = (dx**2 + dy**2)**0.5  # Simplified distance calculation
+        distance = (dx**2 + dy**2)**0.5 
 
         if distance < self.chase_range:
             if distance != 0:
@@ -150,6 +167,12 @@ class Enemy(Entity):
                 dy /= distance
             self.change_x = dx * self.speed
             self.change_y = 0  # Enemies don't jump
+
+            if self.is_ground_ahead():
+                self.change_x = dx * self.speed
+            else:
+                self.change_x = 0  # Stop if there's no ground ahead
+
         else:
             self.change_x = 0
             self.change_y = 0
@@ -157,8 +180,6 @@ class Enemy(Entity):
         # Apply velocity to the enemy using the physics engine
         velocity = (self.change_x, self.change_y)
         physics_engine.set_velocity(self, velocity)
-
-    
 
         # Check for boundaries and reverse direction if needed
         if self.boundary_left is not None and self.center_x < self.boundary_left:
@@ -197,14 +218,14 @@ class Enemy(Entity):
             self.animation_timer = 0
 
 class RobotEnemy(Enemy):
-    def __init__(self):
-        super().__init__("robot", "robot")
+    def __init__(self, platform_list):
+        super().__init__("robot", "robot", platform_list)
         self.health = 50
         self.default_damage = 10
 
 class SuperRobot(RobotEnemy):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, platform_list):
+        super().__init__(platform_list)
         self.scale = 2.0  # Make the SuperRobot twice as big
         self.health = 1000  # Increase health to make it stronger
         self.default_damage = 30  # Increase damage to make it stronger

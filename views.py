@@ -1,7 +1,7 @@
 import arcade
 import math
 import constants as game
-from entities import Player, RobotEnemy, SuperRobot
+from entities_copy import Player, RobotEnemy, SuperRobot
 from typing import Optional
 
 class TitleView(arcade.View):
@@ -304,9 +304,9 @@ class GameView(arcade.View):
             )
             enemy_type = my_object.properties["type"]
             if enemy_type == "robot":
-                enemy = RobotEnemy()
+                enemy = RobotEnemy(self.wall_list)
             elif enemy_type == "superrobot":
-                enemy = SuperRobot()
+                enemy = SuperRobot(self.wall_list)
             enemy.center_x = math.floor(
                 cartesian[0] * game.SPRITE_SCALING_TILES * tile_map.tile_width
             )

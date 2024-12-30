@@ -8,7 +8,6 @@ def main():
     title_view = TitleView()
     window.show_view(title_view)
     arcade.run()
-
 if __name__ == "__main__":
     
 

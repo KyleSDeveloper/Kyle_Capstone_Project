@@ -194,7 +194,7 @@ class Enemy(Entity):
 class RobotEnemy(Enemy):
     def __init__(self):
         super().__init__("robot", "robot")
-        self.health = 100
+        self.health = 50
         self.default_damage = 10
 
 class SuperRobot(RobotEnemy):

@@ -139,17 +139,16 @@ class Enemy(Entity):
     
     def is_ground_ahead(self):
         """ Check if there is ground in front of the enemy """
-        # Determine where to check based on movement direction
         direction = 1 if self.change_x > 0 else -1
         front_x = self.center_x + (self.width / 2 * direction)
-        front_y = self.center_y - self.height / 2  # Check at feet level
+        front_y = self.center_y - self.height / 2  
 
         # Create a dummy sprite to check collision
         check_sprite = arcade.Sprite()
         check_sprite.center_x = front_x
         check_sprite.center_y = front_y
-        check_sprite.width = 1  # Width of collision check
-        check_sprite.height = self.height  # Check entire height of enemy
+        check_sprite.width = 1  
+        check_sprite.height = self.height  
 
         # Check if there's any platform under the new position
         collisions = arcade.check_for_collision_with_list(check_sprite, self.platform_list)
@@ -160,7 +159,7 @@ class Enemy(Entity):
         # Chase the player if within range
         dx = player_sprite.center_x - self.center_x
         dy = player_sprite.center_y - self.center_y
-        distance = (dx**2 + dy**2)**0.5  # Simplified distance calculation
+        distance = (dx**2 + dy**2)**0.5 
 
         if distance < self.chase_range:
             if distance != 0:

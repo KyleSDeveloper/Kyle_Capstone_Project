@@ -1,6 +1,7 @@
 # Kyle's Capstone
 
-                                ROBOGEDDON
+                                                ROBOGEDDON
 
-![Screenshot of ROBOGEDDON](assets/images/game_over.png)
+![Screenshot of ROBOGEDDON](assets/images/instructions_screen.png)
+
 

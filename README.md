@@ -2,22 +2,9 @@
 
                                                 ROBOGEDDON
 
-<div style="text-align: center;">
-    <img src="assets/images/instructions_screen.png" alt="Screenshot of ROBOGEDDON" width="400" height="300"/>
-</div>
+![Terminator gif showing a scene from the movie](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDFqaXU2NnNteWlmZWRtcmRqY2wyaDR0bmx4ODV2cGNkejV3ZnF4ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IZY2SE2JmPgFG/giphy.gif)
 
-<div style="text-align: center;">
-    <img src="assets/images/future.gif" alt="Sci-fi Themed GIF" width="400" height="300"/>
-</div>
 
-<div style="text-align: center;">
-    <img src="assets/images/title_image.png" alt="Screenshot of ROBOGEDDON" width="400" height="300"/>
-</div>
-
-<div style="text-align: center;">
-    <iframe src="https://giphy.com/embed/ddokwE6r0JVctjrSNO" width="480" height="480" style="" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
-    <p><a href="https://giphy.com/gifs/futurefitapp-future-futurefit-futureoffitness-ddokwE6r0JVctjrSNO">via GIPHY</a></p>
-</div>
 
 
 

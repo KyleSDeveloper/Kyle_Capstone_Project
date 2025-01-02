@@ -6,4 +6,8 @@
     <img src="assets/images/instructions_screen.png" alt="Screenshot of ROBOGEDDON" width="400" height="300"/>
 </div>
 
+<div style="text-align: center;">
+    <img src="assets/images/future_gif.png" alt="Sci-fi Themed GIF" width="400" height="300"/>
+</div>
+
 

@@ -7,7 +7,7 @@
 </div>
 
 <div style="text-align: center;">
-    <img src="assets/images/future_gif.png" alt="Sci-fi Themed GIF" width="400" height="300"/>
+    <img src="assets/images/future.gif" alt="Sci-fi Themed GIF" width="400" height="300"/>
 </div>
 
 

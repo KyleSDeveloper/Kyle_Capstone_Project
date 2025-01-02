@@ -2,7 +2,7 @@
 
                                                 ROBOGEDDON
 
-<img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDFqaXU2NnNteWlmZWRtcmRqY2wyaDR0bmx4ODV2cGNkejV3ZnF4ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IZY2SE2JmPgFG/giphy.gif" alt="Terminator GIF showing a scene from the movie" style="float: right; margin-left: 10px;">
+<img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZDFqaXU2NnNteWlmZWRtcmRqY2wyaDR0bmx4ODV2cGNkejV3ZnF4ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IZY2SE2JmPgFG/giphy.gif" alt="Terminator GIF showing a scene from the movie" style="float: right; margin-left: 500px;">
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -14,7 +14,7 @@
 - [License](#license)
 
 ## Introduction
-This section provides an introduction to the project.
+platform game built in python using the arcade library. 
 
 ## Features
 This section lists the features of the project.

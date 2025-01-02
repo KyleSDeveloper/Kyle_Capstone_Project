@@ -2,6 +2,6 @@
 
                                                 ROBOGEDDON
 
-![Screenshot of ROBOGEDDON](assets/images/instructions_screen.png)
+<img src="assets/images/instructions_screen.png" alt="Screenshot of ROBOGEDDON" width="400" height="300"/>
 
 

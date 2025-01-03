@@ -14,13 +14,13 @@
 - [License](#license)
 
 ## Introduction
-platform game built in python using the arcade library. 
+Robogeddon is a 2d platform game built in python using the Arcade library. Robogeddon is set in a dystopic future where artrificial intelligence has decided to eliminate humanity. This leads to a war between humans and machines. You play as Ned the cyborg. He is a black person with an afro and a mustache and can shoot lasers from his eyes. The objective is to progress through the levels without getting killed. The player wins the game when they successfully navigate through the levels and destroys the super machine on the last level.
 
 ## Features
-This section lists the features of the project.
+Robogeddon features the PyMunk physics engine for more realistic physics simulations such as collision, mass, and friction responses. 
 
 ## Installation
-This section provides installation instructions.
+To run this game, make sure python is installed on your machine. Download and install python at python.org. Next, clone the repository: https://github.com/C0ZYCHAIRM4N/Kyle_Capstone_Project.git. Navigate to the project directory: cd Kyle_Capstone_Project. Use pip install p-r requirements.txt to install the dependencies. To play the game run the main script: python main.py.
 
 ## Usage
 This section explains how to use the project.

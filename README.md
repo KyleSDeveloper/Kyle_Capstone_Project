@@ -9,7 +9,7 @@
 - [Features](#features)
 - [Usage](#Usage)
 - [Contributing](#Contributing)
-- [Credits](#Credits)
+
 
 
 ## Here's the scoop
@@ -70,9 +70,7 @@ We welcome contributions to Robogeddon! If you have an idea for a new feature, b
 
 Thank you for contributing to Robogeddon! Your contributions help make this project better for everyone.
 
-## Credits
 
-Kyle Spengler
 
 
 

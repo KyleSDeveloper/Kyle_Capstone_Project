@@ -26,7 +26,7 @@ To run this game, make sure python is installed on your machine. Download and in
 This section explains how to use the project.
 
 ## Screenshots
-This section includes screenshots of the project.
+![game over window screen shot](assets/images/game_over.png)
 
 ## Contributing
 This section explains how to contribute to the project.

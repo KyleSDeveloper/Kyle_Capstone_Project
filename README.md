@@ -27,6 +27,7 @@ This section explains how to use the project.
 
 ## Screenshots
 <img src="assets/images/game_over.png" alt="game over window screen shot" width="300" height="200">
+<img src="assets/images/YOU_WIN.png" alt="Screenshot of player when they've won" width="300" height="200"
 
 ## Contributing
 This section explains how to contribute to the project.

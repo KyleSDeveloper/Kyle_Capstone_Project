@@ -4,6 +4,7 @@ from views import TitleView
 import arcade
 import constants as game
 
+
 def main() -> NoReturn:
     """Initialize and run the game window."""
     try:

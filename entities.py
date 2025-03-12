@@ -207,7 +207,7 @@ class Enemy(Entity):
         if self.change_x == 0 and self.change_y == 0:
             self.texture = self.idle_texture_pair[self.character_face_direction]
             return
-
+        
         # Walking animation
         self.animation_timer += delta_time
         if self.animation_timer > 0.1:  # Adjust this value to control animation speed
@@ -222,7 +222,8 @@ class RobotEnemy(Enemy):
         super().__init__("robot", "robot", platform_list)
         self.health = 50
         self.default_damage = 10
-
+        
+        
 class SuperRobot(RobotEnemy):
     def __init__(self, platform_list):
         super().__init__(platform_list)

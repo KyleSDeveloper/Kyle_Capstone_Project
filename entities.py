@@ -222,8 +222,7 @@ class RobotEnemy(Enemy):
         super().__init__("robot", "robot", platform_list)
         self.health = 50
         self.default_damage = 10
-        
-        
+                
 class SuperRobot(RobotEnemy):
     def __init__(self, platform_list):
         super().__init__(platform_list)

@@ -217,6 +217,7 @@ class Enemy(Entity):
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
             self.animation_timer = 0
             
+    
 class RobotEnemy(Enemy):
     def __init__(self, platform_list):
         super().__init__("robot", "robot", platform_list)
